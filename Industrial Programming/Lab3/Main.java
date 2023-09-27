@@ -1,5 +1,4 @@
 import java.io.*;
-import java.text.*;
 
 public class Main
 {
@@ -82,10 +81,6 @@ public class Main
                 }
 
                 bw.write(text[i].toString() + '\n');
-                //text[i].replaceAll(Character.toString(ch), "");
-
-                //bw.write(text[i].replace(0,text[i].length(), i, null))
-                //bw.write(text[i].replaceAll(Character.toString(ch), "") + '\n');
             }
 
             bw.close();
