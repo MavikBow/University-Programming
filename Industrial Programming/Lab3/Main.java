@@ -5,7 +5,7 @@ public class Main
 {
     private static char ch;
     private static int number;
-    private static String[] text = new String[13];
+    private static StringBuilder[] text = new StringBuilder[12];
 
     private static void readInputs()
     {
@@ -50,9 +50,9 @@ public class Main
         isr = new InputStreamReader(is);
 		br = new BufferedReader(isr);
 
-        for(int i = 0; i < 13; i++)
+        for(int i = 0; i < 12; i++)
         {
-            text[i] = br.readLine();
+            text[i] = new StringBuilder(br.readLine());
         }
         
         br.close();
@@ -73,7 +73,19 @@ public class Main
 
             for(int i = 0; i < 12; i++)
             {
-                bw.write(text[i].replaceAll(Character.toString(ch), "") + '\n');
+                for (int j = 0; j < text[i].length(); j++)
+                {
+                    if (text[i].charAt(j) == ch)
+                    {
+                        text[i].deleteCharAt(j);
+                    }
+                }
+
+                bw.write(text[i].toString() + '\n');
+                //text[i].replaceAll(Character.toString(ch), "");
+
+                //bw.write(text[i].replace(0,text[i].length(), i, null))
+                //bw.write(text[i].replaceAll(Character.toString(ch), "") + '\n');
             }
 
             bw.close();
@@ -102,7 +114,10 @@ public class Main
                 {
                     tempNumb = text[i].length();
                 }
-                bw.write(text[i].substring(0, tempNumb) + ch + text[i].substring(tempNumb) + '\n');
+
+                text[i].insert(tempNumb - 1, ch);
+
+                bw.write(text[i].toString() + '\n');
             }
 
             bw.close();
