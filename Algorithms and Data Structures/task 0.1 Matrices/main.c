@@ -65,7 +65,7 @@ void writeOutputs(int* x)
     FILE* out = fopen("output.txt", "w");
     if (out == NULL)
     {
-        printf("error opening input.txt\n");
+        printf("error opening output.txt\n");
         exit(1);
     }
 
@@ -80,9 +80,9 @@ int main()
 
     int result = matrixChain();
 
-    writeOutputs(&result);
-
     free(dimentions);
+
+    writeOutputs(&result);
 
     return 0;
 }
