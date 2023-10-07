@@ -168,7 +168,7 @@ int main()
 
     memAlloc();
 
-    int dp[length + 1][length + 1];
+    int dp[2][length + 1];
 
     int i, j;
 
@@ -178,26 +178,26 @@ int main()
         {
             if (i == 0 || j == 0)
             {
-                dp[i][j] = 0;
+                dp[i&1][j] = 0;
             }
             else if (arrA[i - 1] == arrB[j - 1])
             {
-                dp[i][j] = dp[i - 1][j - 1] + 1;
-                deposit(i - 1, j - 1, dp[i][j]);
+                dp[i&1][j] = dp[(i&1)^1][j - 1] + 1;
+                deposit(i - 1, j - 1, dp[i&1][j]);
 
                 //printf("%d\t%d\t%d\n", i -1,j-1,dp[i][j]);
             }
             else
             {
-                int A = dp[i - 1][j];
-                int B = dp[i][j - 1];
+                int A = dp[(i&1)^1][j];
+                int B = dp[i&1][j - 1];
 
-                dp[i][j] = (A > B) ? A : B;
+                dp[i&1][j] = (A > B) ? A : B;
             }
         }
     }
 
-    analyze(dp[length][length]);
+    analyze(dp[length&1][length]);
 
     writeOutputs();
 
