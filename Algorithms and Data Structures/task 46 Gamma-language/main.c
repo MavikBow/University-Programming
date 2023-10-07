@@ -32,6 +32,8 @@ void readInputs()
     {
         fscanf(in, "%ld", &arrB[i]);
     }
+
+    fclose(in);
 }
 
 void writeOutputs()
@@ -48,45 +50,57 @@ void writeOutputs()
     fclose(out);
 }
 
+void swap(long** a, long** b)
+{
+    long* temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
 int main()
 {
     readInputs();
 
-    int dp[nLength + 1][mLength + 1];
+    if(mLength > nLength)
+    {
+        swap(&arrA, &arrB);
+        
+        nLength = nLength ^ mLength;
+        mLength = nLength ^ mLength;
+        nLength = nLength ^ mLength;
+    }
 
-
+    int dp[2][mLength + 1];
 
     int i, j;
 
-    for (i = 0; i <= nLength; i++)
+    dp[0][0] = 0;
+    dp[1][0] = 0;
+
+    for(j = 1; j <= mLength; j++)
     {
-        for (j = 0; j <= mLength; j++)
+        dp[0][j] = 0;
+    }
+
+    for (i = 1; i <= nLength; i++)
+    {
+        for (j = 1; j <= mLength; j++)
         {
-            if (i == 0 || j == 0)
+            if (arrA[i - 1] == arrB[j - 1])
             {
-                dp[i][j] = 0;
+                dp[i&1][j] = dp[(i&1)^1][j - 1] + 1;
             }
             else
             {
-                if (arrA[i - 1] == arrB[j - 1])
-                {
-                    dp[i][j] = dp[i - 1][j - 1] + 1;
-                    
+                int A = dp[(i&1)^1][j];
+                int B = dp[i&1][j - 1];
 
-                    //printf("%d\t%d\t%d\n", i -1,j-1,dp[i][j]);
-                }
-                else
-                {
-                    int A = dp[i - 1][j];
-                    int B = dp[i][j - 1];
-
-                    dp[i][j] = (A > B) ? A : B;
-                }
+                dp[i&1][j] = (A > B) ? A : B;
             }
         }
     }
 
-    subLen = dp[nLength][mLength];
+    subLen = dp[nLength&1][mLength];
 
     writeOutputs();
 
