@@ -7,7 +7,11 @@ int length;
 int* arrA, * arrB;
 
 int subLen = 0;
-int* subA, * subB;
+int* subA, * subB, *subIndex;
+
+int *finalA, *finalB;
+
+int depLength = 0;
 
 //int** dp;
 
@@ -32,45 +36,67 @@ void readInputs()
 
 void writeOutputs()
 {
-    int i;
 
     printf("%d\n", subLen);
 
-    for(i = 0; i < subLen; i++)
+    if (subLen != 0)
     {
-        printf("%d ", subA[i]);
+        int i;
+        for(i = 0; i < subLen; i++)
+        {
+            printf("%d ", finalA[i]);
+        }
+
+        printf("\n");
+
+        for(i = 0; i < subLen; i++)
+        {
+            printf("%d ", finalB[i]);
+        }
+
+        printf("\n");
     }
+}
 
-    printf("\n");
+void analyze(int MAX)
+{
+    subLen = MAX;
 
-    for(i = 0; i < subLen; i++)
+    finalA = (int *) malloc(subLen * sizeof(int));
+    finalB = (int *) malloc(subLen * sizeof(int));
+
+    int N, k, edgeX = INT_MAX, edgeY = INT_MAX, chosenA, chosenB;
+    for (N = subLen; N > 0; N--)
     {
-        printf("%d ", subB[i]);
-    }
+        chosenA = INT_MIN;
+        chosenB = INT_MIN;
 
-    printf("\n");
+        for (k = 0; k < depLength; k++)
+        {
+            if (subIndex[k] == N)
+            {
+                if (subA[k] >= chosenA && subB[k] >= chosenB)
+                {
+                    if (subA[k] < edgeX && subB[k] < edgeY)
+                    {
+                        finalA[N - 1] = subA[k];
+                        finalB[N - 1] = subB[k];
+                        edgeX = subA[k];
+                        edgeY = subB[k];
+                    }
+                }
+            }
+        }
+    }
 }
 
 void memAlloc()
 {
-    subA = (int *) malloc(length * sizeof(int));
-    subB = (int *) malloc(length * sizeof(int));
+    subA = (int *) malloc(length * length * sizeof(int));
+    subB = (int *) malloc(length * length * sizeof(int));
+    subIndex = (int *) malloc(length * length * sizeof(int));
 
     int i;
-    //for (i = 0; i < length; i++)
-    //{
-     //   arrA[i] = INT_MAX;
-       // arrB[i] = INT_MAX;
-    //}
-
-    /*int i, j;
-
-    dp = (int **)calloc(length + 1, sizeof(int *));
-
-    for(i = 0; i < length; i++)
-    {
-        dp[i] = (int *)calloc(length + 1, sizeof(int));
-    }*/
 }
 
 void memFree()
@@ -79,19 +105,23 @@ void memFree()
     free(arrB);
     free(subA);
     free(subB);
-
-    /*int i;
-    for (i = 0; i < length; i++)
-    {
-        free(dp[i]);
-    }
-
-    free(dp);*/
+    free(subIndex);
+    free(finalA);
+    free(finalB);
 }
 
 void deposit(int i, int j, int N)
 {
     int good = 0;
+
+    subA[depLength] = i;
+    subB[depLength] = j;
+    subIndex[depLength] = N;
+
+    depLength++;
+
+
+    /*
 
     if (N == 1)
     {
@@ -129,15 +159,6 @@ void deposit(int i, int j, int N)
             }
         }
 
-    }
-    /*if (N = subLen)
-    {
-        if (i < subA[N - 1] || j < subB[j - 1])
-        {
-            subA[N - 1] = i;
-            subB[N - 1] = j;
-            subLen = N;
-        }
     }*/
 }
 
@@ -175,6 +196,8 @@ int main()
             }
         }
     }
+
+    analyze(dp[length][length]);
 
     writeOutputs();
 
