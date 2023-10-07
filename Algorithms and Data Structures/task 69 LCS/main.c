@@ -13,8 +13,6 @@ int *finalA, *finalB;
 
 int depLength = 0;
 
-//int** dp;
-
 void readInputs()
 {
     scanf("%d", &length);
@@ -119,47 +117,6 @@ void deposit(int i, int j, int N)
     subIndex[depLength] = N;
 
     depLength++;
-
-
-    /*
-
-    if (N == 1)
-    {
-        good = 1;
-    }
-    else if (N > 1)
-    {
-        if (i > subA[N - 2] && j > subB[N - 2])
-        {
-            good = 1;
-        }
-    }
-
-    if (good == 1)
-    {
-        if (N > subLen)
-        {
-            subA[N - 1] = i;
-            subB[N - 1] = j;
-            subLen = N;
-            return;
-        }
-
-        if (subA[N-1] + subB[N-1] > i + j)
-        {
-            subA[N - 1] = i;
-            subB[N - 1] = j;
-        }
-        else if (subA[N-1] + subB[N-1] == i + j)
-        {
-            if (subA[N-1] * subB[N-1] < i * j)
-            {
-                subA[N - 1] = i;
-                subB[N - 1] = j;
-            }
-        }
-
-    }*/
 }
 
 int main()
@@ -184,8 +141,6 @@ int main()
             {
                 dp[i&1][j] = dp[(i&1)^1][j - 1] + 1;
                 deposit(i - 1, j - 1, dp[i&1][j]);
-
-                //printf("%d\t%d\t%d\n", i -1,j-1,dp[i][j]);
             }
             else
             {
