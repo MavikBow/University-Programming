@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "g:/USB_snowman/2nd year/Operating Systems/Lab1",
-      "program": "g:/USB_snowman/2nd year/Operating Systems/Lab1/build/Debug/outDebug",
+      "cwd": "g:/University-Programming/Operating Systems/Lab1",
+      "program": "g:/University-Programming/Operating Systems/Lab1/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

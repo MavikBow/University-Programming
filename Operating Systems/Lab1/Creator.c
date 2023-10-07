@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
     if (output_file == NULL)
     {
         perror("Creator >>> Error opening output file");
-        exit(1);
+        exit(0);
     }
 
     printf("Creator >>> Read files from a .txt file or manual input? [(0).txt/(1)manual]\nCreator >>> ");
@@ -37,7 +37,12 @@ int main(int argc, char* argv[])
         for(int i = 0; i < amount_of_notes; i++)
         {
             printf("Creator >>> Enter employee number, name and work hours %d:\n", i + 1);
-            scanf("%d %s %d", &e.num, &e.name, &e.hours);
+
+            scanf("%d", &e.num);
+            scanf("%s", e.name);
+            scanf("%d", &e.hours);
+
+            printf("Creator >>> %d %s %d\n", e.num, e.name, e.hours);
 
             fwrite(&e, sizeof(employee), 1, output_file);
         }
@@ -50,14 +55,16 @@ int main(int argc, char* argv[])
             fscanf(input_file, "%s", e.name);
             fscanf(input_file, "%d", &e.hours);
 
+            printf("Creator >>> %d %s %d\n", e.num, e.name, e.hours);
+
             fwrite(&e, sizeof(employee), 1, output_file);
         }
     }
 
-    if(input_file != NULL)
-    {
+    //if(input_file != NULL)
+    //{
         fclose(input_file);
-    }
+    //}
 
     fclose(output_file);
 
