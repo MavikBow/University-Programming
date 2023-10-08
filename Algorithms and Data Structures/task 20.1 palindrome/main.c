@@ -33,21 +33,21 @@ void writeOutputs(int L, char *P) {
     fclose(out);
 }
 
-int palidrome(char *S, char *P)
+short palidrome(char *S, char *P)
 {
-    int length = strlen(P);
+    short length = strlen(P);
     length = strlen(S);
 
     //int dp[length][length];
 
-    int k;
-    int **dp = malloc((length + 1) * sizeof(int *));
+    short k;
+    short **dp = malloc((length + 1) * sizeof(short *));
     for (k = 0; k < (length + 1); k++) {
-        dp[k] = malloc((length + 1) * sizeof(int));
+        dp[k] = malloc((length + 1) * sizeof(short));
     }
 
 
-    int i, j;
+    short i, j;
 
     // making the dp matrix
 
@@ -56,7 +56,7 @@ int palidrome(char *S, char *P)
         dp[i][i - 1] = 0;
     }
 
-    for(i = length - 1; i > -1; i--)
+    for(i = length - 1; i >= 0; i--)
     {
         dp[i][i] = 1;
         for(j = i + 1; j < length; j++)
@@ -80,9 +80,9 @@ int palidrome(char *S, char *P)
     i = 0;
     j = length - 1;
 
-    int pLength = dp[0][length - 1];
-    int pivot1 = 0;
-    int pivot2 = pLength - 1;
+    short pLength = dp[0][length - 1];
+    short pivot1 = 0;
+    short pivot2 = pLength - 1;
 
     P[pLength] = '\0';
 
@@ -120,7 +120,7 @@ int main()
 {
     readInputs(str);
 
-    int length = palidrome(str, pal);
+    short length = palidrome(str, pal);
 
     writeOutputs(length, pal);
 
