@@ -72,6 +72,14 @@ void lis()
     {
         int pos = upperBound(arrN[i], lisLength);
 
+        if(pos > 0)
+        {
+            if(arrI[pos - 1] == arrN[i])
+            {
+                continue;
+            }
+        }
+
         if(pos == lisLength)
         {
             lisLength++;
