@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 int length, lisLength = 0;
 int* arrN, * arrI;
@@ -75,9 +74,10 @@ void lis()
 
         if(pos == lisLength)
         {
-            arrI[lisLength] = arrN[i];
             lisLength++;
         }
+
+        arrI[pos] = arrN[i];
     }
 }
 
