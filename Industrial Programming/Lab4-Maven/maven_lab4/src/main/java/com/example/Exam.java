@@ -7,10 +7,10 @@ public class Exam
 
     public Exam (){}
 
-    public Exam (String n, int g)
+    public Exam (String name, int grade)
     {
-        name = n;
-        grade = g;
+        this.name = name;
+        this.grade = grade;
     }
 
     public String getName() {
