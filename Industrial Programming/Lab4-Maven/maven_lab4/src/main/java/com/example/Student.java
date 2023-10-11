@@ -22,6 +22,14 @@ public class Student {
         this.age = age;
     }
 
+    public Student(Student other)
+    {
+        this.setName(other.getName());
+        this.setSurname(other.getSurname());
+        this.setPatronimic(other.getPatronimic());
+        this.setAge(other.getAge());
+    }
+
     public String getName()
     {
         return name;
