@@ -5,6 +5,8 @@ public class Exam
     private String name = "default_exam_name";
     private int grade = 0;
 
+    public Exam (){}
+
     public Exam (String n, int g)
     {
         name = n;
