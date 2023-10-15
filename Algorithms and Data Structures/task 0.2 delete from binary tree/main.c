@@ -123,14 +123,14 @@ void writeOutputs(struct node* root)
     fclose(out);
 }
 
-int leftmost_key(struct node** root)
+int leftmost_key(struct node* root)
 {
-    if((*root)->left != NULL)
+    if(root->left != NULL)
     {
-        return leftmost_key(&(*root)->left);
+        return leftmost_key(root->left);
     }
 
-    return (*root)->key;
+    return root->key;
 }
 
 void passConnection(struct node** root, struct node** leaf)
@@ -168,7 +168,7 @@ void straightLeft_search(struct node** root, int victim)
             return;
         }
 
-        int new_victim = leftmost_key(&(*root)->right); 
+        int new_victim = leftmost_key((*root)->right); 
         (*root)->key = new_victim;
         straightLeft_search(&(*root)->right, new_victim);
 
