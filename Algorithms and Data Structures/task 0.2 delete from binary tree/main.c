@@ -133,6 +133,12 @@ int leftmost_key(struct node** root)
     return (*root)->key;
 }
 
+void passConnection(struct node** root, struct node** leaf)
+{
+    free(*root);
+    *root = *leaf;
+}
+
 void straightLeft_search(struct node** root, int victim)
 {
     if(*root == NULL){
@@ -152,27 +158,19 @@ void straightLeft_search(struct node** root, int victim)
 
         if((*root)->left != NULL && (*root)->right == NULL)
         {
-            // Merge the tree
-
-            struct node* temp = (*root)->left;
-
-            (*root)->key = (*root)->left->key;
-            (*root)->right = (*root)->left->right;
-            (*root)->left = (*root)->left->left;
-
-            free(temp);
+            passConnection(&(*root), &(*root)->left);
             return;
         }
 
-        if((*root)->right != NULL)
+        if((*root)->left == NULL && (*root)->right != NULL)
         {
-            int new_victim = leftmost_key(&(*root)->right); 
-            (*root)->key = new_victim;
-
-            straightLeft_search(&(*root)->right, new_victim);
-
+            passConnection(&(*root), &(*root)->right);
             return;
         }
+
+        int new_victim = leftmost_key(&(*root)->right); 
+        (*root)->key = new_victim;
+        straightLeft_search(&(*root)->right, new_victim);
 
         return;
 
@@ -180,21 +178,16 @@ void straightLeft_search(struct node** root, int victim)
 
     if((*root)->key > victim)
         straightLeft_search(&(*root)->left, victim);
-    if((*root)->key < victim)
+    else
         straightLeft_search(&(*root)->right, victim);
 }
 
 int main()
 {
     struct node* root;
-
     readInputs(&root);
-
     straightLeft_search(&root, target);
-        
     writeOutputs(root);
-
     memFree(&root);
-
     return 0;
 }
