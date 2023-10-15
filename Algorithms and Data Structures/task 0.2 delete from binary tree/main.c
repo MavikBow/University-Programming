@@ -168,12 +168,15 @@ void straightLeft_search(struct node** root, int victim)
             return;
         }
 
-        int new_victim = leftmost_key((*root)->right); 
-        (*root)->key = new_victim;
-        straightLeft_search(&(*root)->right, new_victim);
+        if((*root)->right != NULL)
+        {
+            int new_victim = leftmost_key((*root)->right); 
+            (*root)->key = new_victim;
+            straightLeft_search(&(*root)->right, new_victim);
+            return;
+        }
 
         return;
-
     }
 
     if((*root)->key > victim)
