@@ -135,8 +135,9 @@ int leftmost_key(struct node* root)
 
 void passConnection(struct node** root, struct node** leaf)
 {
-    free(*root);
+    struct node* temp = *root;
     *root = *leaf;
+    free(temp);
 }
 
 void straightLeft_search(struct node** root, int victim)
