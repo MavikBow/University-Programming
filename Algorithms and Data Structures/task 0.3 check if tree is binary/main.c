@@ -28,7 +28,7 @@ struct node createNode(long long value, int father, char side, int pointer)
     return newNode;
 }
 
-int isSearchable(long long lowerEdge, long long upperEdge, long long address)
+int isSearchable(long long lowerEdge, long long upperEdge, int address)
 {
     long long middleEdge = tree[address].key; 
     int result = 1;
@@ -115,7 +115,7 @@ void writeOutputs(int success)
 
 void leftprintf(int a)
 {
-    printf("%lldd\n", tree[a].key);
+    printf("%lld\n", tree[a].key);
 
     if(tree[a].left != -1)
     {
@@ -133,7 +133,7 @@ int main()
 {
     readInputs();
 
-    //leftprintf(0);
+    //leftprintf(0);z
 
     int success = isSearchable(LONG_LONG_MIN, LONG_LONG_MAX, 0);
     
