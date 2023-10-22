@@ -7,12 +7,12 @@ struct node* tree;
 
 struct node
 {
-    int key;
+    long long key;
     int left;
     int right;
 };
 
-struct node createNode(int value, int father, char side, int pointer)
+struct node createNode(long long value, int father, char side, int pointer)
 {
     struct node newNode = {.key = value, .left = -1, .right = -1};
 
@@ -28,9 +28,9 @@ struct node createNode(int value, int father, char side, int pointer)
     return newNode;
 }
 
-int isSearchable(int lowerEdge, int upperEdge, int address)
+int isSearchable(long long lowerEdge, long long upperEdge, long long address)
 {
-    int middleEdge = tree[address].key; 
+    long long middleEdge = tree[address].key; 
     int result = 1;
 
     if(tree[address].key >= lowerEdge && tree[address].key < upperEdge)
@@ -70,10 +70,11 @@ void readInputs()
         exit(1);
     }
 
-    int key, father;
+    long long key;
+    int father;
     char side;
 
-    fscanf(in, "%d\n%d\n", &nodesTotal, &key);
+    fscanf(in, "%d\n%lld\n", &nodesTotal, &key);
 
     tree = (struct node*) malloc(nodesTotal * sizeof(struct node));
     tree[0].key = key;
@@ -83,7 +84,7 @@ void readInputs()
     int i;
     for(i = 1; i < nodesTotal; i++)
     {
-        fscanf(in, "%d %d %c", &key, &father, &side);
+        fscanf(in, "%lld %d %c", &key, &father, &side);
 
         tree[i] = createNode(key, father - 1, side, i);
     }
@@ -114,7 +115,7 @@ void writeOutputs(int success)
 
 void leftprintf(int a)
 {
-    printf("%d\n", tree[a].key);
+    printf("%lldd\n", tree[a].key);
 
     if(tree[a].left != -1)
     {
@@ -134,7 +135,7 @@ int main()
 
     //leftprintf(0);
 
-    int success = isSearchable(INT_MIN, INT_MAX, 0);
+    int success = isSearchable(LONG_LONG_MIN, LONG_LONG_MAX, 0);
     
     writeOutputs(success);
 
