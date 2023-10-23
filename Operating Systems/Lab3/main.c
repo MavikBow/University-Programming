@@ -5,6 +5,9 @@
 
 CRITICAL_SECTION cs;
 
+int exitIndex;
+HANDLE hExit_Event, hOver_Event;
+
 int *arr;
 int arrLength;
 int threadNumber;
@@ -13,7 +16,6 @@ HANDLE* hThreadArray;
 DWORD* dwThreadArray;
 HANDLE* hRequest_EventArray;
 HANDLE* hPermission_EventArray;
-HANDLE* hContinue_Event;
 
 void unmarkArray(int i)
 {
@@ -37,18 +39,19 @@ void getArray()
 
 DWORD WINAPI marker(LPVOID iNum)
 {
-    int i = *(int*)iNum;
+    int i = (int)iNum;
     srand(i);
 
     int markedCounter = 0;
+    int r;
     while(1)
     {
-        int r = rand() % arrLength;
+        r = rand() % arrLength;
 
         if(arr[r] == 0)
         {
             Sleep(5);
-            arr[r] = i;
+            arr[r] = i + 1;
             markedCounter++;
             Sleep(5);
         }
@@ -56,29 +59,29 @@ DWORD WINAPI marker(LPVOID iNum)
         {
             EnterCriticalSection(&cs);
 
-            printf("Thread number: %d\tThe amount of marked elements: %d\tThe element that can't be marked is number: %d;\n", i, markedCounter, r);
+            printf("Thread number: %d\tThe amount of marked elements: %d\tThe element that can't be marked is number: %d;\n", i + 1, markedCounter, r);
 
             LeaveCriticalSection(&cs); 
 
-            // TODO 3.4.2
-
+    
             SetEvent(hRequest_EventArray[i]);
 
-            // TODO 3.4.3
-            
-            
-         WaitForSingleObject(hPermission_EventArray[threadNumber], INFINITE);
+            // 3.4.3            
+            WaitForSingleObject(hExit_Event, INFINITE);
 
-         //DWORD answer = WaitForMultipleObjects(2, hPermission_EventArray, FALSE, INFINITE);
-
-            //DWORD answer = WaitForSingleObject(hPermission_EventArray, INFINITE);
-
-            //if(answer == WAIT_OBJECT_0 + i)
-            if(1)
+            if(exitIndex == i)
             {
-                unmarkArray(i);
+                Sleep(500);
+                unmarkArray(i + 1);
+                Sleep(500);
+                SetEvent(hOver_Event);
+                Sleep(500);
                 return 0;
             }
+            
+            WaitForSingleObject(hPermission_EventArray[i], INFINITE);
+
+            r = rand() % arrLength;
         }
     }
 
@@ -93,7 +96,7 @@ int main()
     hThreadArray = (HANDLE *) malloc(threadNumber * sizeof(HANDLE));
     dwThreadArray = (DWORD *) malloc(threadNumber * sizeof(DWORD));
     hRequest_EventArray = (HANDLE *) malloc(threadNumber * sizeof(HANDLE));
-    hPermission_EventArray = (HANDLE *) malloc((threadNumber + 1) * sizeof(HANDLE));
+    hPermission_EventArray = (HANDLE *) malloc((threadNumber) * sizeof(HANDLE));
 
     int i;
 
@@ -105,13 +108,12 @@ int main()
         hPermission_EventArray[i] = CreateEvent(NULL, TRUE, FALSE, NULL);
     }
 
-    hPermission_EventArray[threadNumber] = CreateEvent(NULL, TRUE, FALSE, NULL);
-
-    hContinue_Event = hPermission_EventArray[threadNumber];     
+    hExit_Event = CreateEvent(NULL, TRUE, FALSE, NULL);    
+    hOver_Event = CreateEvent(NULL, TRUE, FALSE, NULL);    
 
     for (i = 0; i < threadNumber; i++)
     {
-        hThreadArray[i] = CreateThread(NULL, 0, marker, (LPVOID)&i, 0, &dwThreadArray[i]);
+        hThreadArray[i] = CreateThread(NULL, 0, marker, (void*)i, 0, &dwThreadArray[i]);
 
         if(hThreadArray[i] == NULL)
         {
@@ -131,7 +133,7 @@ int main()
 
     while(requestCounter > 0)
     {
-        WaitForMultipleObjects(threadNumber, hPermission_EventArray, TRUE, INFINITE);
+        WaitForMultipleObjects(requestCounter, hRequest_EventArray, TRUE, INFINITE);
 
         EnterCriticalSection(&cs);
 
@@ -140,28 +142,37 @@ int main()
         {
             printf("%d ", arr[i]);
         }
-        printf("\nEnter the number of thread whom you'll permit continuing 1 ... %d >>> ", threadNumber);
+        printf("\nEnter the number of thread whom you'll permit exiting 1 ... %d >>> ", requestCounter);
         scanf("%d", &permitIndex);
+        
+        exitIndex = permitIndex - 1; //because array indexation starts with 0
 
-        SetEvent(hPermission_EventArray[permitIndex % threadNumber]);
+        // 6.4
+        SetEvent(hExit_Event);
 
-        WaitForSingleObject(hThreadArray[permitIndex % threadNumber], INFINITE);
+        // 6.5
+        WaitForSingleObject(hOver_Event, INFINITE);
+        requestCounter--;
 
-        printf("\nThe array:\n >>> ");
+        // 6.6
+        printf("\nThe array after exit:\n >>> ");
         for(i = 0; i < arrLength; i++)
         {
             printf("%d ", arr[i]);
         }
-        printf("\n");
-
-        SetEvent(hContinue_Event);
+        printf("\n=====================================================\n");
 
         LeaveCriticalSection(&cs);
 
-        requestCounter--;
+        // 6.7
+        for(i = 0; i < threadNumber; i++)
+        {
+            if(i == exitIndex) continue;
+
+            SetEvent(hPermission_EventArray[i]);
+        }
+
     }
-
-
 
     //
     
