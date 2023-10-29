@@ -73,15 +73,12 @@ DWORD WINAPI marker(LPVOID iNum)
             {
                 Sleep(500);
                 unmarkArray(i + 1);
-                Sleep(500);
                 SetEvent(hOver_Event);
-                Sleep(500);
                 return 0;
             }
             
             WaitForSingleObject(hPermission_EventArray[i], INFINITE);
-
-            r = rand() % arrLength;
+            Sleep(500);
         }
     }
 
@@ -142,7 +139,7 @@ int main()
         {
             printf("%d ", arr[i]);
         }
-        printf("\nEnter the number of thread whom you'll permit exiting 1 ... %d >>> ", requestCounter);
+        printf("\nEnter the number of thread whom you'll permit exiting >>> ");
         scanf("%d", &permitIndex);
         
         exitIndex = permitIndex - 1; //because array indexation starts with 0
@@ -164,14 +161,16 @@ int main()
 
         LeaveCriticalSection(&cs);
 
+        //Sleep(1000);
+
         // 6.7
         for(i = 0; i < threadNumber; i++)
         {
             if(i == exitIndex) continue;
 
             SetEvent(hPermission_EventArray[i]);
+            //Sleep(20);
         }
-
     }
 
     //
