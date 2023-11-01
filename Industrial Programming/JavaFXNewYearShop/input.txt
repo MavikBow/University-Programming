@@ -1,0 +1,21 @@
+Samsung
+5
+fridge 100
+phone 5
+TV 30
+microwave 20
+blender 15
+Sony
+4
+PS1 10
+PSP 20
+PS2 15
+PS3 40
+Walmart
+6
+bed 50
+lamp 10
+table 30
+chair 20
+carpet 30
+cupboard 25
