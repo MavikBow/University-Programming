@@ -16,9 +16,8 @@ void insert(int value)
     do
     {
         ad = address(value, i);
-        if(arr[ad] == value) break;
         i++;
-    } while (arr[ad] != -1);
+    } while (arr[ad] != -1 && arr[ad] != value);
 
     arr[ad] = value;
 }
