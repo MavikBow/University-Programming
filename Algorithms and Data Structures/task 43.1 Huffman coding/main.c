@@ -259,7 +259,7 @@ void doHuffman2()
 int main()
 {
     readInputs();
-    doHuffman2();
+    doHuffman1();
     writeOutputs();
     return 0;
 }
