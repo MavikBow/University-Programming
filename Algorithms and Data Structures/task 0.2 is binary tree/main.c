@@ -3,19 +3,21 @@
 
 int*arr, size, success = 1;
 
-void bin_check(int target, int i)
+void bin_check()
 {
-    if(i > size) return;
-
-    if(target > arr[i])
+    int i;
+    for(i = 2; i <= size; i++)
     {
-        success = 0;
-        return;
+        if(arr[i] < arr[i>>1])
+        {
+            success = 0;
+            return;
+        }
     }
 
-    bin_check(arr[i], i<<1);
-    bin_check(arr[i], (i<<1) + 1);
+    return;
 }
+
 int main()
 {
     FILE *in, *out;
@@ -35,7 +37,7 @@ int main()
 
     out = fopen("output.txt", "w");
 
-    bin_check(0, 1);
+    bin_check();
 
     if(success != 0)
     {
