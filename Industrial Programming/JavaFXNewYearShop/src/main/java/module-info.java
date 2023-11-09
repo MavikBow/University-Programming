@@ -1,4 +1,4 @@
-module com.example.javafxnewyearshop {
+module com.example.javafxnewyear2 {
     requires javafx.controls;
     requires javafx.fxml;
 

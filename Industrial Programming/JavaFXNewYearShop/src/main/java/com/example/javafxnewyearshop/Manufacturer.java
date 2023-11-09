@@ -7,11 +7,16 @@ public class Manufacturer {
     public String name;
     public int amount;
     public ArrayList<Item> list;
-    public boolean chosen;
+    public ArrayList<String> nameList;
 
     public Manufacturer(Scanner sc) throws Exception {
-        this.chosen = false;
+        list = new ArrayList<>();
+        nameList = new ArrayList<>();
         this.read(sc);
+        for(int i = 0; i < amount; i++)
+        {
+            nameList.add(list.get(i).name);
+        }
     }
 
     public String getName() {
@@ -28,6 +33,11 @@ public class Manufacturer {
 
     public void setAmount(int amount) {
         this.amount = amount;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 
     public class Item{
@@ -84,5 +94,27 @@ public class Manufacturer {
             }
         }
         return price;
+    }
+
+    public void clearAll()
+    {
+        for(int i = 0; i < list.size(); i++)
+        {
+            list.get(i).setMarked(false);
+        }
+    }
+
+    public void setChosenProduct(String pName)
+    {
+        for(int i = 0; i < list.size(); i++)
+        {
+            if(list.get(i).name == pName)
+            {
+                list.get(i).setMarked(true);
+            }
+            else {
+                list.get(i).setMarked(false);
+            }
+        }
     }
 }
