@@ -370,7 +370,7 @@ int main()
     imposter = findImposter();
     if(imposter != NULL)
     {
-        straightLeft_search(&root, imposter->key);
+        straightLeft_search(&origin.root, imposter->key);
     }
     writeOutputs(root);
     memFree(&root);
