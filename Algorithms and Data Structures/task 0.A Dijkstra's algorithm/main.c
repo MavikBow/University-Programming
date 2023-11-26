@@ -133,14 +133,17 @@ void mergeSort(Road* arr, int left, int right)
 
 void visit(int A)
 {
+    unsigned long temp;
     int i = lowerBound(A);
     for(; roadArr[i].A == A; i++)
     {
         if(cityArr[roadArr[i].B].isMarked == 0)
         {
-            if(cityArr[roadArr[i].B].weight > cityArr[roadArr[i].A].weight + (unsigned long)roadArr[i].weight)
+            temp = cityArr[roadArr[i].A].weight + (unsigned long)roadArr[i].weight;
+            
+            if(cityArr[roadArr[i].B].weight > temp)
             {
-                cityArr[roadArr[i].B].weight = cityArr[roadArr[i].A].weight + (unsigned long)roadArr[i].weight;
+                cityArr[roadArr[i].B].weight = temp;
             }
 
             if(roadArr[i].weight < bestRoad.weight)
@@ -150,6 +153,7 @@ void visit(int A)
             }
         }
     }
+
     cityArr[A].isMarked = 1;
 }
 
