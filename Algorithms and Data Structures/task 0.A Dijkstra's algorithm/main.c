@@ -6,167 +6,135 @@ typedef struct
 {
     int A, B;
     short weight;
+    int next;
 } Road;
 
 typedef struct
 {
     unsigned long weight;
-    char isMarked;
+    int number;
 } City;
 
-struct destination
-{
-    short weight;
-    int city;
-};
+City*cityTree;
+Road*roadList;
+int*roadHead;
+const unsigned long VISITED = ULONG_MAX;
+const unsigned long NOTVISITED = ULONG_MAX - 1;
+unsigned long answer;
 
-int cityAmount, roadAmount;
-Road*roadArr;
-City*cityArr;
-struct destination bestRoad;
+int cityAmount, treeSize, roadAmount, roadWriter, CITYSHIFT;
 
-void parr()
+void cityTree_create()
 {
-    int i;
-    for(i = 0; i < cityAmount; i++)
+    int i, j, k;
+    CITYSHIFT = (treeSize>>1) - 1;
+    i = CITYSHIFT;
+    j = CITYSHIFT;
+
+    for(i = treeSize >> 1, k = 1; i < (treeSize >> 1) + cityAmount; i++, k++)
     {
-        printf("%lu ", cityArr[i].weight);
+        cityTree[i].number = k;
     }
-    printf("\t b = %d\n", bestRoad.city + 1);
-}
-
-int lowerBound(int target)
-{
-    int left = 0;
-    int right = roadAmount;
-
-    int middle;
-
-    while(left < right)
+    for(i = 0; i < treeSize; i++)
     {
-        middle = (left + right) >> 1;
+        cityTree[i].weight = NOTVISITED;
+    }
 
-        if (roadArr[middle].A >= target)
-        {
-            right = middle;
-        }
+    cityTree[j].weight = 0;
+    cityTree[j].number = 0;
+
+    for(i = j; i > 0; i = (i-1)>>1)
+    {
+        cityTree[i] = cityTree[j];
+    }
+    cityTree[0] = cityTree[j];
+}
+void cityTree_set(int i, unsigned long weight)
+{
+    cityTree[i + CITYSHIFT].weight = weight;
+}
+void cityTree_update(int i)
+{
+    int j = i + CITYSHIFT; 
+    City temp = cityTree[j];
+
+    for(; j > 0; j = (j-1)>>1)
+    {
+        cityTree[j] = temp;
+
+        if((j&1) == 0)
+            temp = cityTree[j-1];
         else
+            temp = cityTree[j+1];
+    
+        if(temp.weight > cityTree[j].weight)
         {
-            left = middle + 1;
+            temp = cityTree[j];
         }
     }
 
-    return left;
+    cityTree[0] = temp;
+}
+void cityTree_unmark(int i)
+{
+    cityTree_set(i, VISITED);
+    cityTree_update(i);
+}
+unsigned long cityTree_getWeight(int i)
+{
+    return cityTree[i + CITYSHIFT].weight;
 }
 
-void merge(Road* arr, int left, int mid, int right)
+void roadList_addRoad(int A, int B, short weight)
 {
-    Road* tmp = (Road *) malloc((unsigned)(right - left + 1) * sizeof(Road));
-    int i;
+    Road temp;
+    temp.A = A;
+    temp.B = B;
+    temp.weight = weight;
+    temp.next = roadHead[A];
 
-    int pos = 0, p1 = left, p2 = mid + 1;
-
-    while(p1 <= mid && p2 <= right)
-    {
-        if(arr[p1].A < arr[p2].A)
-        {
-            tmp[pos].weight = arr[p1].weight;
-            tmp[pos].B = arr[p1].B;
-            tmp[pos].A = arr[p1].A;
-
-            pos++;
-            p1++;
-        }
-        else
-        {
-            tmp[pos].weight = arr[p2].weight;
-            tmp[pos].B = arr[p2].B;
-            tmp[pos].A = arr[p2].A;
-
-            pos++;
-            p2++;
-        }
-    }
-
-    while(p1 <= mid)
-    {
-        tmp[pos].weight = arr[p1].weight;
-        tmp[pos].B = arr[p1].B;
-        tmp[pos].A = arr[p1].A;
-
-        pos++;
-        p1++;
-    }
-
-    while(p2 <= right)
-    {
-        tmp[pos].weight = arr[p2].weight;
-        tmp[pos].B = arr[p2].B;
-        tmp[pos].A = arr[p2].A;
-
-        pos++;
-        p2++;
-    }
-
-    for(i = 0; i < pos; i++)
-    {
-        arr[i+ left].weight = tmp[i].weight;
-        arr[i+ left].B = tmp[i].B;
-        arr[i+ left].A = tmp[i].A;
-    }
-
-    free(tmp);
+    roadList[roadWriter] = temp;
+    roadHead[A] = roadWriter;
+    roadWriter++;
 }
 
-void mergeSort(Road* arr, int left, int right)
+int step2(int x)
 {
-    int mid = (right + left) >> 1;
-
-    if(left < right)
+    int res = 1;
+    while(res < x)
     {
-        mergeSort(arr, left, mid);
-        mergeSort(arr, mid + 1, right);
-
-        merge(arr, left, mid, right);
+        res <<= 1;
     }
+    return res;
 }
 
 void visit(int A)
 {
+    int j;
     unsigned long temp;
-    int i = lowerBound(A);
-    for(; roadArr[i].A == A; i++)
+    for(j = roadHead[A]; roadList[j].A == A; j = roadList[j].next)
     {
-        if(cityArr[roadArr[i].B].isMarked == 0)
+        if(cityTree_getWeight(roadList[j].B) != VISITED)
         {
-            temp = cityArr[roadArr[i].A].weight + (unsigned long)roadArr[i].weight;
-            
-            if(cityArr[roadArr[i].B].weight > temp)
-            {
-                cityArr[roadArr[i].B].weight = temp;
-            }
+            temp = cityTree_getWeight(A) + (unsigned long)roadList[j].weight;
 
-            if(roadArr[i].weight < bestRoad.weight)
+            if(cityTree_getWeight(roadList[j].B) > temp)
             {
-                bestRoad.weight = roadArr[i].weight;
-                bestRoad.city = roadArr[i].B;
+                cityTree_set(roadList[j].B, temp);
+                cityTree_update(roadList[j].B);
             }
         }
     }
-
-    cityArr[A].isMarked = 1;
+    
+    answer = cityTree_getWeight(A);
+    cityTree_unmark(A);
 }
 
 void dijkstra()
 {
-    bestRoad.city = 0;
-    bestRoad.weight = SHRT_MAX;
-    
-    while(cityArr[cityAmount - 1].isMarked == 0)
+    while(cityTree_getWeight(cityAmount - 1) != VISITED)
     {
-        /*parr();*/
-        visit(bestRoad.city);
-        bestRoad.weight = SHRT_MAX;
+        visit(cityTree[0].number);
     }
 }
 
@@ -179,31 +147,24 @@ void readInputs()
     in = fopen("input.txt", "r");
     fscanf(in, "%d %d", &cityAmount, &roadAmount);
 
-    roadAmount <<= 1;
+    treeSize = step2(cityAmount) << 1;
 
-    cityArr = (City*)malloc((unsigned)cityAmount * sizeof(City));
-    roadArr = (Road*)malloc((unsigned)roadAmount * sizeof(Road));
+    cityTree = (City*)malloc((unsigned)treeSize * sizeof(City));
+    roadList = (Road*)malloc((unsigned)((roadAmount << 1) + 1) * sizeof(Road));
+    roadHead = (int*)calloc((unsigned)cityAmount, sizeof(int));
     
-    for(i = 0; i < cityAmount; i++)
-    {
-        cityArr[i].isMarked = 0;
-        cityArr[i].weight = ULONG_MAX;
-    }
-    cityArr[0].weight = 0;
-
+    roadList[0].A = -1;
+    roadWriter = 1;
+    
     for(i = 0; i < roadAmount; i++)
     {
         fscanf(in, "%d %d %hd", &temp1, &temp2, &temp3);
 
-        roadArr[i].A = temp1 - 1;
-        roadArr[i].B = temp2 - 1;
-        roadArr[i].weight = temp3;
+        temp1--;
+        temp2--;
 
-        i++;
-
-        roadArr[i].B = temp1 - 1;
-        roadArr[i].A = temp2 - 1;
-        roadArr[i].weight = temp3;
+        roadList_addRoad(temp1, temp2, temp3);
+        roadList_addRoad(temp2, temp1, temp3);
     }
 
     fclose(in);
@@ -213,18 +174,20 @@ void writeOutputs()
 {
     FILE *out;
     out = fopen("output.txt", "w");
-    fprintf(out, "%lu\n", cityArr[cityAmount - 1].weight);
+    fprintf(out, "%lu\n", answer);
     fclose(out);
-    
-    free(cityArr);
-    free(roadArr);
 }
 
 int main()
 {
     readInputs();
-    mergeSort(roadArr, 0, roadAmount - 1);
+    cityTree_create();
     dijkstra();
     writeOutputs();
+
+    free(cityTree);
+    free(roadList);
+    free(roadHead);
+
     return 0;
 }
