@@ -11,16 +11,16 @@ typedef struct
 
 typedef struct
 {
-    unsigned long weight;
+    unsigned weight;
     int number;
 } City;
 
 City*cityTree;
 Road*roadList;
 int*roadHead;
-const unsigned long VISITED = ULONG_MAX;
-const unsigned long NOTVISITED = ULONG_MAX - 1;
-unsigned long answer;
+const unsigned VISITED = UINT_MAX;
+const unsigned NOTVISITED = UINT_MAX - 1;
+unsigned answer;
 
 int cityAmount, treeSize, roadAmount, roadWriter, CITYSHIFT;
 
@@ -49,7 +49,7 @@ void cityTree_create()
     }
     cityTree[0] = cityTree[j];
 }
-void cityTree_set(int i, unsigned long weight)
+void cityTree_set(int i, unsigned weight)
 {
     int j = i + CITYSHIFT; 
     City temp = cityTree[j];
@@ -73,7 +73,7 @@ void cityTree_set(int i, unsigned long weight)
 
     cityTree[0] = temp;
 }
-unsigned long cityTree_getWeight(int i)
+unsigned cityTree_getWeight(int i)
 {
     return cityTree[i + CITYSHIFT].weight;
 }
@@ -103,12 +103,12 @@ int step2(int x)
 void visit(int A)
 {
     int j;
-    unsigned long temp;
+    unsigned temp;
     for(j = roadHead[A]; j; j = roadList[j].next)
     {
         if(cityTree_getWeight(roadList[j].B) != VISITED)
         {
-            temp = cityTree_getWeight(A) + (unsigned long)roadList[j].weight;
+            temp = cityTree_getWeight(A) + (unsigned)roadList[j].weight;
 
             if(cityTree_getWeight(roadList[j].B) > temp)
             {
