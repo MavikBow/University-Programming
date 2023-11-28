@@ -51,12 +51,10 @@ void cityTree_create()
 }
 void cityTree_set(int i, unsigned long weight)
 {
-    cityTree[i + CITYSHIFT].weight = weight;
-}
-void cityTree_update(int i)
-{
     int j = i + CITYSHIFT; 
     City temp = cityTree[j];
+    
+    temp.weight = weight;
 
     for(; j > 0; j = (j-1)>>1)
     {
@@ -74,11 +72,6 @@ void cityTree_update(int i)
     }
 
     cityTree[0] = temp;
-}
-void cityTree_unmark(int i)
-{
-    cityTree_set(i, VISITED);
-    cityTree_update(i);
 }
 unsigned long cityTree_getWeight(int i)
 {
@@ -120,13 +113,12 @@ void visit(int A)
             if(cityTree_getWeight(roadList[j].B) > temp)
             {
                 cityTree_set(roadList[j].B, temp);
-                cityTree_update(roadList[j].B);
             }
         }
     }
     
     answer = cityTree_getWeight(A);
-    cityTree_unmark(A);
+    cityTree_set(A, VISITED);
 }
 
 void dijkstra()
