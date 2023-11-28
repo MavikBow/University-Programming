@@ -4,7 +4,7 @@
 
 typedef struct
 {
-    int A, B;
+    int B;
     short weight;
     int next;
 } Road;
@@ -88,7 +88,6 @@ unsigned long cityTree_getWeight(int i)
 void roadList_addRoad(int A, int B, short weight)
 {
     Road temp;
-    temp.A = A;
     temp.B = B;
     temp.weight = weight;
     temp.next = roadHead[A];
@@ -112,7 +111,7 @@ void visit(int A)
 {
     int j;
     unsigned long temp;
-    for(j = roadHead[A]; roadList[j].A == A; j = roadList[j].next)
+    for(j = roadHead[A]; j; j = roadList[j].next)
     {
         if(cityTree_getWeight(roadList[j].B) != VISITED)
         {
@@ -153,7 +152,6 @@ void readInputs()
     roadList = (Road*)malloc((unsigned)((roadAmount << 1) + 1) * sizeof(Road));
     roadHead = (int*)calloc((unsigned)cityAmount, sizeof(int));
     
-    roadList[0].A = -1;
     roadWriter = 1;
     
     for(i = 0; i < roadAmount; i++)
