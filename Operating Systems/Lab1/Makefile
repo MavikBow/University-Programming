@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -pedantic -std=c99
+CFLAGS = -Wall -Wextra -Wsign-conversion -Wconversion -pedantic -std=c89
 SRC = $(wildcard *.c)
 EXECUTABLES = $(SRC:.c=.exe)
 
@@ -8,7 +8,7 @@ EXECUTABLES = $(SRC:.c=.exe)
 all: $(EXECUTABLES)
 
 %.exe: %.c
-	$(CC) $(CFLAGS) $< -o build/$@
+	$(CC) $(CFLAGS) $< -o $@
 
 clean:
 	rm -rf build *.exe
