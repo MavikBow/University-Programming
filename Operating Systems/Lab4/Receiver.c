@@ -17,6 +17,7 @@ int main()
     char sender_launcher_num[255];
     int i;
 
+    HANDLE*hReadyEvent;
     HANDLE hMutex;
     hMutex = CreateMutex(NULL, TRUE, "ConsoleMutex");
     if (hMutex == NULL)
@@ -49,6 +50,8 @@ int main()
         si[i].cb = sizeof(STARTUPINFO);
     }
     pi = (PROCESS_INFORMATION*)malloc((unsigned)sender_amount * sizeof(STARTUPINFO));
+
+    hReadyEvent = (HANDLE*)malloc((unsigned)sender_amount * sizeof(HANDLE));
 
     for(i = 0; i < sender_amount; i++)
     {
