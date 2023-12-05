@@ -7,14 +7,19 @@
 int main(int argc, char* argv[])
 {
     HANDLE consoleMutex;
+    int id;
+    char filename[100];
+
+    strcpy(filename, argv[1]);
+    id = atoi(argv[2]);
+
     consoleMutex = OpenMutex(MUTEX_ALL_ACCESS, FALSE, "ConsoleMutex");
-if (consoleMutex == NULL)
+    if (consoleMutex == NULL)
     {
         printf("Mutex Fail!");
 
         return (int)GetLastError();
 
     }
-    int id = atoi(argv[2]);
     return 0;
 }
