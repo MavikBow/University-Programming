@@ -71,11 +71,14 @@ int main()
 	for(i = 0; i < opCount; i++)
 	{
 		fscanf(in, "%s %s %s", temp1, temp2, temp3);
-		var1 = atoi(temp1 + 1) - 1;
-		var2 = atoi(temp3 + 1) - 1;
 
 		if(strcmp(temp2, "==") == 0)
+		{
+			var1 = atoi(temp1 + 1) - 1;
+			var2 = atoi(temp3 + 1) - 1;
 			add(var1, var2);
+		}
+
 	}
 
 	fclose(in);
@@ -88,15 +91,17 @@ int main()
 	for(i = 0; i < opCount; i++)
 	{
 		fscanf(in, "%s %s %s", temp1, temp2, temp3);
-		var1 = atoi(temp1 + 1) - 1;
-		var2 = atoi(temp3 + 1) - 1;
 
 		if(strcmp(temp2, "!=") == 0)
+		{
+			var1 = atoi(temp1 + 1) - 1;
+			var2 = atoi(temp3 + 1) - 1;
 			if(relatives(var1, var2))
 			{
 				exists = 0;
 				break;
 			}
+		}
 	}
 
 	fclose(in);
