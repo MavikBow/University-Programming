@@ -1,5 +1,7 @@
 package com.example.javafxnewyearshop;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -13,6 +15,19 @@ public class Manufacturer {
         list = new ArrayList<>();
         nameList = new ArrayList<>();
         this.read(sc);
+        for(int i = 0; i < amount; i++)
+        {
+            nameList.add(list.get(i).name);
+        }
+    }
+
+    public Manufacturer(String name, ResultSet rs) throws SQLException {
+        list = new ArrayList<>();
+        nameList = new ArrayList<>();
+        this.setName(name);
+
+        this.readDB(rs);
+
         for(int i = 0; i < amount; i++)
         {
             nameList.add(list.get(i).name);
@@ -83,6 +98,14 @@ public class Manufacturer {
             String[] line = sc.nextLine().split("\\s+");
             list.add(new Item(line[0], Integer.parseInt(line[1])));
         }
+    }
+
+    public void readDB(ResultSet rs) throws SQLException {
+        while(rs.next())
+        {
+            list.add(new Item(rs.getString("name"), rs.getInt("price")));
+        }
+        this.amount = list.size();
     }
 
     public int getPriceOverall()

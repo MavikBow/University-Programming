@@ -4,8 +4,57 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import java.sql.*;
+
 public class Model
 {
+    private final String URL = "jdbc:mysql://localhost:3306/mydbtest";
+    private final String USERNAME = "root";
+    private final String PASSWORD = "root";
+
+    private void readBD()
+    {
+        try
+        {
+            //Class.forName("org.mysql.JDBC");
+            Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+            System.out.println("DataBase connection successful!");
+
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery("SELECT concert_price FROM mydbtest.program;");
+
+            while(rs.next())
+            {
+                concertPrice = rs.getInt("concert_price");
+            }
+
+            rs = statement.executeQuery("SELECT name FROM mydbtest.manufacturer where program_id = 1;");
+
+            nameList = new ArrayList<>();
+            while(rs.next())
+            {
+                nameList.add(rs.getString("name"));
+            }
+            manufactureAmount = nameList.size();
+
+            manufactureList = new ArrayList<>();
+            for(int i = 0; i < manufactureAmount; i++)
+            {
+                rs = statement.executeQuery("SELECT * FROM mydbtest.product where manufacturer_id = " + Integer.toString(i + 1) + ";");
+
+                Manufacturer m = new Manufacturer(nameList.get(i), rs);
+                manufactureList.add(m);
+            }
+
+            connection.close();
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+            System.out.println("bobo ");
+        }
+    }
+
     private int manufactureAmount;
     private ArrayList<Manufacturer> manufactureList;
     public ArrayList<String> nameList;
@@ -16,7 +65,8 @@ public class Model
 
     public Model()
     {
-        read();
+        //read();
+        readBD(); //reads completely from a database. A full replacement to the read from txt method
         nameList = new ArrayList<>();
         for(int i = 0; i < manufactureAmount; i++)
         {
