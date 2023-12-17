@@ -1,79 +1,103 @@
+/*executes the BFS algorithm to check if the road exists.
+if positive, executes Dijkstra's algorithm, but instead of G graph it does it for L(G) graph;
+
+The datastructes: 
+    cityDataBase,
+    roadTable,
+    roadTree,
+    BFSVisitArray;
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
 
 typedef struct
 {
-    unsigned weight;
-    int number;
-} City;
+    short x, y;
+    unsigned short roads_incoming;
+    unsigned int weight;
+} CityData;
 
 typedef struct
 {
-    short x, y, visits_left, previous_visit, roads_incoming;
-} CityData;
+    unsigned int actual_weight;
+    unsigned short A, B;
+} RoadData;
 
-City*cityTree;
-short**roadTable;
-CityData*dataBase;
+typedef struct
+{
+    short weight;
+    unsigned short number;
+} roadTableData;
 
-const unsigned FULLYVISITED = UINT_MAX;
-const unsigned NOTVISITED = UINT_MAX - 1;
-const unsigned NOTFULLYVISITED = UINT_MAX - 2;
+
+CityData*cityDataBase;
+roadTableData**roadTable;
+RoadData*roadTree;
+
+unsigned int cityAmount, roadAmount, penalty, treeSize;
+unsigned CITYSHIFT;
+unsigned short startCity, endCity;
+
+const unsigned VISITED = UINT_MAX;
+const unsigned UNVISITED = UINT_MAX - 1;
 
 unsigned answer = UINT_MAX - 1;
 char endVisited = 0;
 
-int cityAmount, treeSize, roadAmount, CITYSHIFT, startCity, endCity;
-unsigned penalty;
-
-void cityTree_create()
+void roadTree_create()
 {
-    int i, k;
+    unsigned short i, j, k;
     CITYSHIFT = (treeSize>>1) - 1;
-    i = CITYSHIFT;
 
-    for(i = treeSize >> 1, k = 1; i < (treeSize >> 1) + cityAmount; i++, k++)
-    {
-        cityTree[i].number = k;
-    }
+    for(i = 0, k = 0; i < cityAmount; i++)
+        for(j = 0; j < cityAmount; j++)
+            if(roadTable[i][j].weight >= 0)
+            {
+                roadTable[i][j].number = k;
+
+                roadTree[k + CITYSHIFT].A = i;
+                roadTree[k + CITYSHIFT].B = j;
+
+                k++;
+            }
+
     for(i = 0; i < treeSize; i++)
-    {
-        cityTree[i].weight = NOTVISITED;
-    }
+        roadTree[i].actual_weight = UNVISITED;
 }
-void cityTree_set(int i, unsigned weight)
+void roadTree_set(int i, unsigned weight)
 {
-    int j = i + CITYSHIFT; 
-    City temp = cityTree[j];
+    int j = i + (int)CITYSHIFT; 
+    RoadData temp = roadTree[j];
     
-    temp.weight = weight;
+    temp.actual_weight = weight;
 
     for(; j > 0; j = (j-1)>>1)
     {
-        cityTree[j] = temp;
+        roadTree[j] = temp;
 
         if((j&1) == 0)
-            temp = cityTree[j-1];
+            temp = roadTree[j-1];
         else
-            temp = cityTree[j+1];
+            temp = roadTree[j+1];
     
-        if(temp.weight > cityTree[j].weight)
+        if(temp.actual_weight > roadTree[j].actual_weight)
         {
-            temp = cityTree[j];
+            temp = roadTree[j];
         }
     }
 
-    cityTree[0] = temp;
+    roadTree[0] = temp;
 }
-unsigned cityTree_getWeight(int i)
+unsigned roadTree_getWeight(unsigned i)
 {
-    return cityTree[i + CITYSHIFT].weight;
+    return roadTree[i + CITYSHIFT].actual_weight;
 }
 
-int step2(int x)
+unsigned step2(unsigned x)
 {
-    int res = 1;
+    unsigned res = 1;
     while(res < x)
     {
         res <<= 1;
@@ -84,90 +108,76 @@ int step2(int x)
 void readInputs()
 {
     FILE *in;
-    short i, j, temp1, temp2, temp3;
+    short temp1, temp2, temp3;
+    unsigned i, j, tempRoad;
 
     in = fopen("input.txt", "r");
-    fscanf(in, "%d %d %u", &cityAmount, &roadAmount, &penalty);
+    fscanf(in, "%u %u %u", &cityAmount, &roadAmount, &penalty);
 
     cityAmount++;
+    tempRoad = roadAmount;
+    roadAmount <<= 1;
+    roadAmount++;
 
-    treeSize = step2(cityAmount) << 1;
+    treeSize = step2(roadAmount) << 1;
 
-    cityTree = (City*)malloc((unsigned)treeSize * sizeof(City));
-    dataBase = (CityData*)calloc((unsigned)cityAmount, sizeof(CityData));
-    roadTable = (short**)malloc((unsigned)cityAmount * sizeof(short*));
-    for(i = 0; i < cityAmount; i++)
-    {
-        roadTable[i] = (short*)malloc((unsigned)cityAmount * sizeof(short));
-    }
+    cityDataBase = (CityData*)calloc(cityAmount, sizeof(CityData));
+    roadTree = (RoadData*)malloc(treeSize * sizeof(RoadData));
+    roadTable = (roadTableData**)malloc(cityAmount * sizeof(roadTableData*));
+    for(i = 0; i < cityAmount; i++) roadTable[i] = (roadTableData*)malloc(cityAmount * sizeof(roadTableData));
 
     for(i = 0; i < cityAmount; i++)
         for(j = 0; j < cityAmount; j++)
         {
-            roadTable[i][j] = -1;
+            roadTable[i][j].weight = -1;
         }
 
     for(i = 1; i < cityAmount; i++)
     {
         fscanf(in, "%hd %hd", &temp1, &temp2);
 
-        dataBase[i].x = temp1;
-        dataBase[i].y = temp2;
+        cityDataBase[i].x = temp1;
+        cityDataBase[i].y = temp2;
     }
     
-    for(i = 0; i < roadAmount; i++)
+    for(i = 0; i < tempRoad; i++)
     {
         fscanf(in, "%hd %hd %hd", &temp1, &temp2, &temp3);
 
-        roadTable[temp1][temp2] = temp3;
-        roadTable[temp2][temp1] = temp3;
+        roadTable[temp1][temp2].weight = temp3;
+        roadTable[temp2][temp1].weight = temp3;
 
-        dataBase[temp1].roads_incoming++;
-        dataBase[temp2].roads_incoming++;
-        dataBase[temp1].visits_left++;
-        dataBase[temp2].visits_left++;
+        cityDataBase[temp1].roads_incoming++;
+        cityDataBase[temp2].roads_incoming++;
     }
 
-    fscanf(in, "%d %d", &startCity, &endCity);
+    fscanf(in, "%hu %hu", &startCity, &endCity);
     
     fclose(in);
 }
 
 void init()
 {
-    dataBase[0].x = dataBase[startCity].x;
-    dataBase[0].y = dataBase[startCity].y;
-    dataBase[0].y--;
-    dataBase[startCity].previous_visit = 0;
+    cityDataBase[0].x = cityDataBase[startCity].x;
+    cityDataBase[0].y = cityDataBase[startCity].y;
+    cityDataBase[0].y--;
 
+    roadTable[0][startCity].weight = 0;
 
-    /*roadTable[0][startCity] = 0;*/
-
-    cityTree_create();
-    cityTree_set(startCity, 0);
-    cityTree_set(0, FULLYVISITED);
+    roadTree_create();
+    roadTree_set(0, 0);
 }
 
-void writeOutputs()
-{
-    FILE*out = fopen("output.txt", "w");
-    if(answer == NOTVISITED)
-        fprintf(out, "No\n");
-    else
-        fprintf(out, "Yes\n%u\n", answer);
-    fclose(out);
-}
-
-unsigned needPenalty(int A, int B)
+unsigned needPenalty(unsigned short A, unsigned short B, unsigned short C)
 {
     int x1, y1, x2, y2, x3, y3, result;
 
-    x1 = dataBase[dataBase[A].previous_visit].x;
-    y1 = dataBase[dataBase[A].previous_visit].y;
-    x2 = dataBase[A].x;
-    y2 = dataBase[A].y;
-    x3 = dataBase[B].x;
-    y3 = dataBase[B].y;
+    x1 = (int)cityDataBase[A].x;
+    y1 = (int)cityDataBase[A].y;
+    x2 = (int)cityDataBase[B].x;
+    y2 = (int)cityDataBase[B].y;
+    x3 = (int)cityDataBase[C].x;
+    y3 = (int)cityDataBase[C].y;
 
     /*calcutates for left turn*/
     result = (x1-x2)*(y3-y2)-(y1-y2)*(x3-x2);
@@ -182,78 +192,68 @@ unsigned needPenalty(int A, int B)
     return 1;
 }
 
-void visit(int A)
+void visit(RoadData road)
 {
-    int B;
-    unsigned temp;
+    unsigned C, temp;
+    unsigned short number;
 
-    if(A == endCity)
+    if(road.B == endCity)
     {
         endVisited = 1;
-        answer = cityTree[0].weight;
+        answer = road.actual_weight;
         return;
     }
 
-    for(B = 1; B < cityAmount; B++)
+    for(C = 0; C < cityAmount; C++)
     {
-        if(roadTable[A][B] != -1)
+        if(roadTable[road.B][C].weight >= 0)
         {
-            temp = cityTree_getWeight(A) + (unsigned)roadTable[A][B] + (unsigned)dataBase[A].roads_incoming * needPenalty(A, B) * penalty;
+            temp = road.actual_weight + (unsigned)roadTable[road.B][C].weight + 
+            cityDataBase[road.B].roads_incoming * needPenalty(road.A, road.B, (unsigned short)C) * penalty;
+            number = roadTable[road.B][C].number;
 
-            if(cityTree_getWeight(B) > temp)
-            {
-                cityTree_set(B, temp);
-                dataBase[B].previous_visit = (short)A;
-            }
+            if(roadTree_getWeight(number) > temp)
+                roadTree_set(number, temp);
         }
     }
 
-    roadTable[dataBase[A].previous_visit][A] = -1;
-    dataBase[A].visits_left--;
-
-    if(dataBase[A].visits_left == 0)
-    {
-        cityTree_set(A, FULLYVISITED);
-        for(B = 1; B < cityAmount; B++)
-            roadTable[B][A] = -1;
-    }
-    else
-        cityTree_set(A, NOTFULLYVISITED);
-
+    roadTable[road.A][road.B].weight = -2;
+    roadTree_set(roadTable[road.A][road.B].number, VISITED);
 }
 
 void dijkstra()
 {
-    int i = 0;
-    while(cityTree[0].weight != NOTVISITED && endVisited == 0)
-    {
-        visit(cityTree[0].number);
-        i++;
-        /*
-        for(i = 1; i < cityAmount; i++) printf("%u ", cityTree_getWeight(i));
-        printf("\n");
-        printf("vidit %d, roads left %d hi\n", cityTree[0].number, dataBase[cityTree[0].number].visits_left);
-        printf("top element %u definetely is not %u\n", cityTree[0].weight, NOTVISITED);
-        */
-    }
+    while(roadTree[0].actual_weight != UNVISITED && endVisited == 0)
+        visit(roadTree[0]);  
+}
+
+void writeOutputs()
+{
+    FILE*out = fopen("output.txt", "w");
+    if(answer == UNVISITED)
+        fprintf(out, "No\n");
+    else
+        fprintf(out, "Yes\n%u\n", answer);
+    fclose(out);
+}
+
+void final()
+{
+    unsigned i;
+    free(cityDataBase);
+    free(roadTable);
+    for(i = 0; i < cityAmount; i++) free(roadTable[i]);
+    free(roadTable);
 }
 
 int main()
 {
-    int i;
     readInputs();
     init();
+
     dijkstra();
     writeOutputs();
 
-    free(cityTree);
-    free(dataBase);
-/*
-    for(i = 0; i < cityAmount; i++)
-    {
-        free(roadTable[i]);
-    }
-    free(roadTable);
-*/
-    return 0;
+    final();
+    return 0; 
 }
