@@ -4,8 +4,7 @@ if positive, executes Dijkstra's algorithm, but instead of G graph it does it fo
 The datastructes: 
     cityDataBase,
     roadTable,
-    roadTree,
-    BFSVisitArray;
+    roadTree;
 */
 
 #include <stdio.h>
@@ -16,7 +15,6 @@ typedef struct
 {
     short x, y;
     unsigned short roads_incoming;
-    unsigned int weight;
 } CityData;
 
 typedef struct
@@ -43,7 +41,7 @@ unsigned short startCity, endCity;
 const unsigned VISITED = UINT_MAX;
 const unsigned UNVISITED = UINT_MAX - 1;
 
-unsigned answer = UINT_MAX - 1;
+unsigned answer;
 char endVisited = 0;
 
 void roadTree_create()
@@ -230,10 +228,10 @@ void dijkstra()
 void writeOutputs()
 {
     FILE*out = fopen("output.txt", "w");
-    if(answer == UNVISITED)
-        fprintf(out, "No\n");
-    else
+    if(endVisited)
         fprintf(out, "Yes\n%u\n", answer);
+    else
+        fprintf(out, "No\n");
     fclose(out);
 }
 
