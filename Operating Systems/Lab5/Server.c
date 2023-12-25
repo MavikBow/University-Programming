@@ -20,6 +20,9 @@ HANDLE*hThread;
 DWORD*ThreadID;
 PipeInfo* pipes;
 int* countOfReaders;
+STARTUPINFO*si;
+PROCESS_INFORMATION*pi;
+char launcher[20];
 
 void init()
 {
@@ -116,30 +119,34 @@ void write(employee st, DWORD pos)
     LeaveCriticalSection(&cs);
 }
 
-DWORD WINAPI serverThread(LPVOID pr_)
+DWORD WINAPI serverThread(LPVOID lpParam)
 {
-    PipeInfo pr = *(PipeInfo*)pr_;
+    PipeInfo* pr = (PipeInfo*)lpParam;
     command c;
     DWORD bytes, pos;
     employee st;
 
-    ConnectNamedPipe(pr.hReadHandle, (LPOVERLAPPED)NULL);
-    ConnectNamedPipe(pr.hWriteHandle, (LPOVERLAPPED)NULL);
+    if(!ConnectNamedPipe(pr->hReadHandle, (LPOVERLAPPED)NULL)) printf("fail1\n");
+    if(!ConnectNamedPipe(pr->hWriteHandle, (LPOVERLAPPED)NULL)) printf("fail2\n");
 
     do
     {
-        ReadFile(pr.hReadHandle, &c, sizeof(command), &bytes, 0);
+        if(!ReadFile(pr->hReadHandle, &c, sizeof(command), &bytes, 0))
+        {
+            printf("Reading failed\n");
+            return 0;
+        }
         if(c.type == 0)
         {
             c.result = lookUp(c.num, &st, &pos);
-            WriteFile(pr.hWriteHandle, &c, sizeof(command), &bytes, 0);
+            WriteFile(pr->hWriteHandle, &c, sizeof(command), &bytes, 0);
             if(c.result)
             {
                 countOfReaders[pos]++;
                 WaitForSingleObject(hWriteAccess[pos], INFINITE);
                 ResetEvent(hReadAccess[pos]);
                 read(&st, pos);
-                WriteFile(pr.hWriteHandle, &st, sizeof(employee), &bytes, 0);
+                WriteFile(pr->hWriteHandle, &st, sizeof(employee), &bytes, 0);
                 countOfReaders[pos]--;
                 if(!countOfReaders[pos]) SetEvent(hReadAccess[pos]);
             }
@@ -147,23 +154,23 @@ DWORD WINAPI serverThread(LPVOID pr_)
         else if(c.type == 1)
         {
             c.result = lookUp(c.num, &st, &pos);
-            WriteFile(pr.hWriteHandle, &c, sizeof(command), &bytes, 0);
+            WriteFile(pr->hWriteHandle, &c, sizeof(command), &bytes, 0);
             if(c.result)
             {
                 WaitForSingleObject(hReadAccess[pos], INFINITE);
                 WaitForSingleObject(hWriteAccess[pos], INFINITE);
                 ResetEvent(hWriteAccess[pos]);
                 read(&st, pos);
-                WriteFile(pr.hWriteHandle, &st, sizeof(employee), &bytes, 0);
-                ReadFile(pr.hReadHandle, &st, sizeof(employee), &bytes, 0);
+                WriteFile(pr->hWriteHandle, &st, sizeof(employee), &bytes, 0);
+                ReadFile(pr->hReadHandle, &st, sizeof(employee), &bytes, 0);
                 write(st, pos);
                 SetEvent(hWriteAccess[pos]);
             }
         }
     } while (c.type != 3);
     
-    DisconnectNamedPipe(pr.hReadHandle);
-    DisconnectNamedPipe(pr.hWriteHandle);
+    DisconnectNamedPipe(pr->hReadHandle);
+    DisconnectNamedPipe(pr->hWriteHandle);
 
     return 0;   
 }
@@ -178,6 +185,16 @@ int main()
 
     printf("Enter the amount of clients: ");
     scanf("%u", &C);
+    
+    si = (STARTUPINFO*)malloc(C * sizeof(STARTUPINFO));
+    pi = (PROCESS_INFORMATION*)malloc(C * sizeof(PROCESS_INFORMATION));
+
+    for(i = 0; i < C; i++)
+    {
+        ZeroMemory(&si[i], sizeof(STARTUPINFO));
+        si[i].cb = sizeof(STARTUPINFO);
+    }
+
     InitializeCriticalSection(&cs);
 
     hThread = (HANDLE*)malloc(C * sizeof(HANDLE));
@@ -186,6 +203,8 @@ int main()
 
     for(i = 0; i < C; i++)
     {
+        sprintf(launcher, "client.exe %u", i);
+
 		sprintf(pipeName, "\\\\.\\pipe\\Pipe_%d_%d", 1, i);
         printf("%s\n", pipeName);
         pipes[i].hReadHandle = CreateNamedPipe(pipeName, PIPE_ACCESS_INBOUND, PIPE_TYPE_MESSAGE | PIPE_WAIT, 2, 0, 0, INFINITE, NULL);
@@ -194,7 +213,9 @@ int main()
         printf("%s\n", pipeName);
         pipes[i].hWriteHandle = CreateNamedPipe(pipeName, PIPE_ACCESS_OUTBOUND, PIPE_TYPE_MESSAGE | PIPE_WAIT, 2, 0, 0, INFINITE, NULL);
 
-        hThread = CreateThread(NULL, 0, serverThread, &pipes[i], 0, &ThreadID[i]);
+        hThread[i] = CreateThread(NULL, 0, serverThread, &pipes[i], 0, &ThreadID[i]);
+        Sleep(500);
+        CreateProcess(NULL, launcher, NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &si[i], &pi[i]);
         printf("Client ID: %u\n", i);
     }
 
