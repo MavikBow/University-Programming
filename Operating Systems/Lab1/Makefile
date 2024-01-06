@@ -1,14 +1,16 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Wsign-conversion -Wconversion -pedantic -std=c11
-SRC = $(wildcard *.c)
-EXECUTABLES = $(SRC:.c=.exe)
 
-.PHONY: all clean
+SRC_DIR = src
+BUILD_DIR = build
 
-all: $(EXECUTABLES)
+SRCS = $(wildcard $(SRC_DIR)/*.c)
+EXES = $(SRCS:$(SRC_DIR)/%.c=$(BUILD_DIR)/%)
 
-%.exe: %.c
-	$(CC) $(CFLAGS) $< -o build/$@
+$(BUILD_DIR)/%: $(SRC_DIR)/%.c
+	$(CC) $(CFLAGS) $< -o $@
+
+all: $(EXES)
 
 clean:
-	rm -rf build *.exe
+	rm -f $(BUILD_DIR)/*
