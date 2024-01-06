@@ -8,7 +8,7 @@ EXECUTABLES = $(SRC:.c=.exe)
 all: $(EXECUTABLES)
 
 %.exe: %.c
-	$(CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $< -o build/$@
 
 clean:
 	rm -rf build *.exe
