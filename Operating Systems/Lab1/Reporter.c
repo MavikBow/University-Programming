@@ -8,6 +8,11 @@ int main(int argc, char* argv[])
     FILE *input_file, *output_file;
     employee e;
 
+    if(argc == 0)
+    {
+        return 1;
+    }
+
     char* input_file_name = argv[1];
     char* output_file_name = argv[2];
     int pay_per_hour = atoi(argv[3]);
@@ -32,7 +37,7 @@ int main(int argc, char* argv[])
     {
         e.name[strcspn(e.name, "\n")] = '\0';
 
-        fprintf(output_file, "%d\t%s\t%d\t%d\n", e.num, e.name, e.hours, e.hours * pay_per_hour);
+        fprintf(output_file, "%d\t%s\t%.2lf\t%.2lf\n", e.num, e.name, e.hours, e.hours * (double)pay_per_hour);
     }
 
     if (input_file != NULL)

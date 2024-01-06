@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Wsign-conversion -Wconversion -pedantic -std=c89
+CFLAGS = -Wall -Wextra -Wsign-conversion -Wconversion -pedantic -std=c11
 SRC = $(wildcard *.c)
 EXECUTABLES = $(SRC:.c=.exe)
 

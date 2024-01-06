@@ -45,7 +45,7 @@ int main()
     {
         e.name[strcspn(e.name, "\n")] = '\0';
 
-        printf("%d\t%s\t%d\n", e.num, e.name, e.hours);
+        printf("%d\t%s\t%.2lf\n", e.num, e.name, e.hours);
     }
 
     fclose(input_file);

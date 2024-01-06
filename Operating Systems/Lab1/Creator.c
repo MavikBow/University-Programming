@@ -8,6 +8,11 @@ int main(int argc, char* argv[])
     FILE *input_file, *output_file;
     employee e;
 
+    if(argc == 0)
+    {
+        return 1;
+    }
+
     char* file_name = argv[1];
     int amount_of_notes = atoi(argv[2]);
 
@@ -40,9 +45,9 @@ int main(int argc, char* argv[])
 
             scanf("%d", &e.num);
             scanf("%s", e.name);
-            scanf("%d", &e.hours);
+            scanf("%lf", &e.hours);
 
-            printf("Creator >>> %d %s %d\n", e.num, e.name, e.hours);
+            printf("Creator >>> %d %s %.2lf\n", e.num, e.name, e.hours);
 
             fwrite(&e, sizeof(employee), 1, output_file);
         }
@@ -53,9 +58,9 @@ int main(int argc, char* argv[])
         {
             fscanf(input_file, "%d", &e.num);
             fscanf(input_file, "%s", e.name);
-            fscanf(input_file, "%d", &e.hours);
+            fscanf(input_file, "%lf", &e.hours);
 
-            printf("Creator >>> %d %s %d\n", e.num, e.name, e.hours);
+            printf("Creator >>> %d %s %.2lf\n", e.num, e.name, e.hours);
 
             fwrite(&e, sizeof(employee), 1, output_file);
         }
