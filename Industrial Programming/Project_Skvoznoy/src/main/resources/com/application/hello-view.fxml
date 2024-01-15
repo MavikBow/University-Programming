@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="521.0" prefWidth="346.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.application.Controller">
+   <children>
+      <ImageView fitHeight="521.0" fitWidth="346.0" layoutX="191.0" layoutY="-1.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-64.0" AnchorPane.topAnchor="0.0">
+         <image>
+            <Image url="@bg.png" />
+         </image></ImageView>
+      <Button fx:id="chooseButton" contentDisplay="CENTER" graphicTextGap="0.0" layoutX="74.0" layoutY="23.0" mnemonicParsing="false" onAction="#choosePress" prefHeight="10.0" prefWidth="197.0" scaleShape="false" style="-fx-background-color: #662e1c; -fx-text-fill: #ebdcb2;" text="Choose File" textAlignment="CENTER">
+         <font>
+            <Font name="JetBrains Mono NL Bold" size="15.0" />
+         </font>
+      </Button>
+      <ImageView id="resultImage" fx:id="resultImage" fitHeight="42.0" fitWidth="43.0" layoutX="271.0" layoutY="373.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@tick.png" />
+         </image></ImageView>
+      <Label fx:id="chooseLabel" layoutX="37.0" layoutY="60.0" prefHeight="42.0" prefWidth="270.0" text="File" textFill="#36180f">
+         <font>
+            <Font name="JetBrains Mono Light" size="13.0" />
+         </font>
+      </Label>
+      <Label fx:id="resultLabel" layoutX="37.0" layoutY="375.0" prefHeight="42.0" prefWidth="225.0" text="Result File" textAlignment="RIGHT" textFill="#36180f">
+         <font>
+            <Font name="JetBrains Mono Light" size="13.0" />
+         </font>
+      </Label>
+      <VBox alignment="CENTER_LEFT" layoutX="27.0" layoutY="129.0" prefHeight="194.0" prefWidth="90.0">
+         <children>
+            <RadioButton fx:id="zipRadar" mnemonicParsing="false" selected="true" text="Zip" textFill="#36180f">
+               <font>
+                  <Font name="JetBrains Mono Light" size="12.0" />
+               </font>
+               <toggleGroup>
+                  <ToggleGroup fx:id="ZipButtons" />
+               </toggleGroup></RadioButton>
+            <Separator prefHeight="27.0" prefWidth="100.0" visible="false" />
+            <RadioButton fx:id="jarRadar" mnemonicParsing="false" text="Jar" textFill="#36180f" toggleGroup="$ZipButtons">
+               <font>
+                  <Font name="JetBrains Mono Light" size="12.0" />
+               </font></RadioButton>
+            <Separator prefHeight="27.0" prefWidth="200.0" visible="false" />
+            <RadioButton fx:id="unZipRadar" mnemonicParsing="false" text="UnZip" textFill="#36180f" toggleGroup="$ZipButtons">
+               <font>
+                  <Font name="JetBrains Mono Light" size="12.0" />
+               </font></RadioButton>
+            <Separator prefHeight="27.0" prefWidth="200.0" visible="false" />
+            <RadioButton fx:id="unJarRadar" mnemonicParsing="false" text="UnJar" textFill="#36180f" toggleGroup="$ZipButtons">
+               <font>
+                  <Font name="JetBrains Mono Light" size="12.0" />
+               </font></RadioButton>
+         </children>
+      </VBox>
+      <VBox alignment="CENTER_LEFT" layoutX="242.0" layoutY="129.0" prefHeight="194.0" prefWidth="86.0">
+         <children>
+            <RadioButton fx:id="encryptRadar" mnemonicParsing="false" selected="true" text="Encrypt" textFill="#36180f">
+               <font>
+                  <Font name="JetBrains Mono Light" size="12.0" />
+               </font>
+               <toggleGroup>
+                  <ToggleGroup fx:id="CryptButtons" />
+               </toggleGroup>
+            </RadioButton>
+            <Separator prefHeight="33.0" prefWidth="100.0" visible="false" />
+            <RadioButton fx:id="decryptRadar" mnemonicParsing="false" text="Decrypt" textFill="#36180f" toggleGroup="$CryptButtons">
+               <font>
+                  <Font name="JetBrains Mono Light" size="12.0" />
+               </font>
+            </RadioButton>
+            <Separator prefHeight="52.0" prefWidth="100.0" visible="false" />
+         </children></VBox>
+      <HBox alignment="CENTER" layoutX="3.0" layoutY="465.0" prefHeight="52.0" prefWidth="339.0">
+         <children>
+            <Button fx:id="processButton" mnemonicParsing="false" onAction="#ProcessAll" prefHeight="0.0" prefWidth="100.0" style="-fx-background-color: #662e1c; -fx-text-fill: #ebdcb2;" text="Process">
+               <font>
+                  <Font name="JetBrains Mono Bold" size="14.0" />
+               </font>
+            </Button>
+            <Separator orientation="VERTICAL" prefHeight="52.0" prefWidth="100.0" visible="false" />
+            <Button fx:id="exitButton" mnemonicParsing="false" prefHeight="0.0" prefWidth="66.0" style="-fx-background-color: #662e1c; -fx-text-fill: #ebdcb2;" text="Exit">
+               <font>
+                  <Font name="JetBrains Mono Bold" size="14.0" />
+               </font></Button>
+         </children>
+      </HBox>
+      <CheckBox fx:id="encryptBox1" layoutX="157.0" layoutY="151.0" mnemonicParsing="false" onAction="#encrypt1" />
+      <CheckBox fx:id="zipBox" layoutX="170.0" layoutY="218.0" mnemonicParsing="false" />
+      <CheckBox fx:id="encryptBox2" layoutX="159.0" layoutY="289.0" mnemonicParsing="false" onAction="#encrypt2" />
+   </children>
+</AnchorPane>
