@@ -126,6 +126,8 @@ public class BackEnd
                 case "-e":
                     set2++;
                     break;
+                case "":
+                    break;
                 default:
                     setbroken++;
                     break;
