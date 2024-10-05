@@ -1,9 +1,9 @@
 ! basically the matrix we work with is matrixFull
 ! it looks like this: [A:f:E]
-! while we are transforming the A into E as per Gauss-Jordan method
-! f turns into the x we search, and E becomes A^(-1)
+! while we are transforming the A part into E as per Gauss-Jordan method
+! the f part turns into the x we search, and the E part becomes A^(-1)
 !
-! we need the -copy matrices to calculate and analyse the discrepancy
+! we need the -copy matrices to calculate and analyse the discrepancy afterwards
 ! r is the discrepancy we get after counting x, and R - after A^(-1)
 
 program gauss
@@ -62,7 +62,7 @@ program gauss
     matrixR = matrixEcopy - matmul(matrixFull(:,matrixSize + 2 :), matrixAcopy)
 
 
-    print '(A, E14.4)', ' detA is ', detA
+    print '(A, F14.5)', ' detA is ', detA
     print *, 'matrix R'
     do i = 1, size(matrixR, 1)
         print '(5(E14.4, 1X))', (matrixR(i,j), j = 1, matrixSize)
@@ -71,10 +71,10 @@ program gauss
     print '(E14.4)', r
     print *, 'matrix A^(-1)'
     do i = 1, size(matrixFull, 1)
-        print '(5(E14.4, 1X))', (matrixFull(i,matrixSize + 1 + j), j = 1, matrixSize)
+        print '(5(F14.5, 1X))', (matrixFull(i,matrixSize + 1 + j), j = 1, matrixSize)
     end do
     print *, 'vector x'
-    print '(E14.4)', matrixFull(:,matrixSize + 1)
+    print '(F14.5)', matrixFull(:,matrixSize + 1)
 
     close(inputFile) 
 
@@ -96,7 +96,7 @@ contains
         allocate(tempArr(size(matrixFull,2)))
 
         do i = 1, size(matrixFull, 1)
-            tempInt = maxloc(matrixFull(:,i))
+            tempInt = maxloc(matrixFull(i:,i))
             j = tempInt(1)
             if (j > i) then
                 tempArr = matrixFull(i,:)
@@ -114,7 +114,7 @@ contains
         real(kind=dp), dimension(:,:), intent(inout) :: A
         integer :: i, j, n
 
-        n = size(A, 1)
+        n = size(A, 1) ! the number of rows
 
         do i = 1, n
             A(i, i + 1 :) = A(i, i + 1 :) / A(i,i)
