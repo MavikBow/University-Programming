@@ -1,10 +1,10 @@
-! basically the matrix we work with is matrixFull
-! it looks like this: [A:f:E]
-! while we are transforming the A into E as per Gauss-Jordan method
-! f turns into the x we search, and E becomes A^(-1)
+! we work with the matrixA, make it tridiagonal before starting.
+! (although it manually nullifies the non-tridiagonal elements).
+! r is the discrepancy we get after counting x
 !
-! we need the -copy matrices to calculate and analyse the discrepancy
-! r is the discrepancy we get after counting x, and R - after A^(-1)
+! in the mathematical formulae the indexing starts with 0,
+! but since it was a huge pain to do that in Fortran (yes, i tried)
+! i have lifted the lower indecies in the formulae from 0 to 1 and from 1 to 2
 
 program gauss
     implicit none
@@ -94,7 +94,7 @@ contains
 
         detA = 1_dp
 
-        ! careful here, a(2) from the formulae will be at a(1) here, so accessing is done thusly: a(i-1)
+        ! careful here, the a(2) from the formulae will be at a(1) here, so accessing is done thusly: a(i-1)
         associate(a => [ (-M(i,i-1), i = 2, n) ])
         associate(b => [ (-M(i,i+1), i = 1, n-1) ])
         associate(c => [ (M(i,i), i = 1, n) ] )
