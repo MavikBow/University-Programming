@@ -57,6 +57,10 @@ program gauss
     print '(A)', 'vector r'
     print '(ES14.4)', r
 
+    print *
+    print '(A)', 'detA'
+    print '(F14.5)', detA
+
 
     close(inputFile) 
 
@@ -98,6 +102,8 @@ contains
         associate(a => [ (-M(i,i-1), i = 2, n) ])
         associate(b => [ (-M(i,i+1), i = 1, n-1) ])
         associate(c => [ (M(i,i), i = 1, n) ] )
+
+        detA = c(n)
 
         ksi(n) = a(n-1) / c(n)
         eta(n) = f(n) / c(n)
