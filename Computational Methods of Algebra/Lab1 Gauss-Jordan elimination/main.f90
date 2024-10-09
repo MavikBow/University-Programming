@@ -65,13 +65,13 @@ program gauss
     print '(A, F14.5)', ' detA is ', detA
     print *, 'matrix R'
     do i = 1, size(matrixR, 1)
-        print '(5(E14.4, 1X))', (matrixR(i,j), j = 1, matrixSize)
+        print '(5(ES11.4, 1X))', (matrixR(i,j), j = 1, matrixSize)
     end do
     print *, 'vector r'
-    print '(E14.4)', r
+    print '(ES11.4)', r
     print *, 'matrix A^(-1)'
     do i = 1, size(matrixFull, 1)
-        print '(5(F14.5, 1X))', (matrixFull(i,matrixSize + 1 + j), j = 1, matrixSize)
+        print '(5(F10.5, 1X))', (matrixFull(i,matrixSize + 1 + j), j = 1, matrixSize)
     end do
     print *, 'vector x'
     print '(F14.5)', matrixFull(:,matrixSize + 1)

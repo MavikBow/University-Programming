@@ -55,7 +55,7 @@ program gauss
     r = matmul(matrixA, x) - f
     print *
     print '(A)', 'vector r'
-    print '(E14.4)', r
+    print '(ES14.4)', r
 
 
     close(inputFile) 
