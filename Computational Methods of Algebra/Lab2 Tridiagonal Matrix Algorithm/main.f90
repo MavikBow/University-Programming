@@ -136,4 +136,4 @@ contains
             x(i + 1) = ksi(i + 1) * x(i) + eta(i + 1)
         end do
     end subroutine
-end program gauss
+end program triagon

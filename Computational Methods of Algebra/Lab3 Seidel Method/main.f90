@@ -81,13 +81,20 @@ program seidel
     ! method ends
     ! calculating the discrepancy 
 
+    print '(A)', 'the approximate x'
+
     if (MOD(iteration_count, 2) == 1) then ! x2 is the last value
         r = matmul(matrixA, x2) - f
+        print '(F14.5)', x2
     else ! x1 is the last value
         r = matmul(matrixA, x1) - f
+        print '(F14.5)', x1
     end if
 
+    print '(A)', 'vector r'
     print '(ES11.4)', r
+
+
     close(inputFile) 
 
     deallocate(matrixA)
@@ -130,4 +137,4 @@ contains
     end do
     end subroutine
 
-end program gauss
+end program seidel
