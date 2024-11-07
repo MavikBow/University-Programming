@@ -1,4 +1,10 @@
 ! we work with the matrixA
+! the initial equation is Ax = f
+! but the Seidel method is iterational for the equation of x = Bx + b
+! so we make into this format by doing b = f and B = (I - A)
+! I name the "I" matrix as "E" for consistency with my own notes
+! Note that the resulting B has to have a cubic norm of less than 1 for the method to work
+!
 ! r is the discrepancy we get after counting x
 
 program gauss
@@ -97,17 +103,13 @@ contains
     function cubic_norm(A) result(max_norm)
     real(kind=dp), dimension(:,:), intent(in) :: A
     real(kind=dp) :: norm, max_norm
-    integer :: i, j, n
+    integer :: i, n
 
     max_norm = 0
     n = size(A, 1) ! number of rows
 
     do i = 1, n
-        norm = 0
-        do j = 1, n
-            norm = norm + abs(A(i,j))
-        end do
-
+        norm = sum(abs(A(i,:)))
         if (norm >= max_norm) then
             max_norm = norm
         end if
