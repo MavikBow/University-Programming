@@ -6,7 +6,7 @@
 ! but since it was a huge pain to do that in Fortran (yes, i tried)
 ! i have lifted the lower indecies in the formulae from 0 to 1 and from 1 to 2
 
-program gauss
+program triagon
     implicit none
 
     integer, parameter :: dp = selected_real_kind(15, 307)

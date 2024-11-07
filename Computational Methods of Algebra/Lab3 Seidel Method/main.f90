@@ -7,7 +7,7 @@
 !
 ! r is the discrepancy we get after counting x
 
-program gauss
+program seidel
     implicit none
 
     integer, parameter :: dp = selected_real_kind(15, 307)
