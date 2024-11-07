@@ -8,8 +8,9 @@ program gauss
     real(kind=dp), dimension(:,:), allocatable :: matrixA, matrixE, matrixB
     real(kind=dp), dimension(:), allocatable :: f, x1, x2, b, r 
     real(kind=dp) :: detA
+    real(kind=dp), parameter :: Eps = 0.00001_dp
     integer :: inputFile, matrixSize
-    integer :: i, j
+    integer :: i, j, iteration_count
 
     inputFile = 1
     detA = 1_dp
@@ -54,7 +55,33 @@ program gauss
     print '(A)', 'cubic norm of matrix B'
     print '(F14.5)', cubic_norm(matrixB)
 
+    ! method starts
+    b = f
+    x1 = b
+    iteration_count = 0
+    do
+        iteration_count = iteration_count + 1
+        call iteration(x1, x2, matrixB, b)
+        if (maxval(abs(x1 - x2)) <= Eps) exit
+        
+        iteration_count = iteration_count + 1
+        call iteration(x2, x1, matrixB, b)
+        if (maxval(abs(x1 - x2)) <= Eps) exit
+    end do
 
+    print '(A)', 'the number of iterations'
+    print *, iteration_count 
+
+    ! method ends
+    ! calculating the discrepancy 
+
+    if (MOD(iteration_count, 2) == 1) then ! x2 is the last value
+        r = matmul(matrixA, x2) - f
+    else ! x1 is the last value
+        r = matmul(matrixA, x1) - f
+    end if
+
+    print '(ES11.4)', r
     close(inputFile) 
 
     deallocate(matrixA)
@@ -85,6 +112,20 @@ contains
             max_norm = norm
         end if
     end do
-
     end function
+
+    subroutine iteration(x1, x2, mB, b)
+    real(kind=dp), dimension(:,:), intent(in) :: mB
+    real(kind=dp), dimension(:), intent(inout) :: x1, x2
+    real(kind=dp), dimension(:), intent(in) :: b
+    integer :: i, n
+
+    n = size(mB,1)
+
+    x2(1) = dot_product(mB(1,:),x1) + b(1)
+    do i = 2, n
+        x2(i) = dot_product(mB(i,:i-1), x2(:i-1)) + dot_product(mB(i,i:), x1(i:)) + b(i)
+    end do
+    end subroutine
+
 end program gauss
