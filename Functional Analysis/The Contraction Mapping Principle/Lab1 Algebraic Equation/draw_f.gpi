@@ -1,0 +1,9 @@
+#! /usr/bin/gnuplot -persist
+set terminal png size 800, 600
+set output "graph.png"
+set xlabel "x"
+set ylabel "g"
+set grid
+set xrange [0.32:0.35]
+set yrange [-0.2:0.2]
+plot x**5 + 3*x -1 title "g(x) = x**5 + 3*x - 1" lc rgb "red", 0 lc rgb "blue"
