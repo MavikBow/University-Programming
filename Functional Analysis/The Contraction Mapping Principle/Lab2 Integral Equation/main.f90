@@ -8,7 +8,7 @@ program IntergralEq
     integer, parameter :: dp = selected_real_kind(15, 307)
     real(kind=dp), dimension(:), allocatable :: t, x0, x1, x_precise, y
     real(kind=dp) :: alpha, n_calculated, lambda_0, h, temp
-    real(kind=dp), parameter :: Eps = 0.000001_dp
+    real(kind=dp), parameter :: Eps = 0.001_dp
     integer :: i, n_approximated, n_actual, m
 
     ! initiating variables
@@ -28,7 +28,7 @@ program IntergralEq
         t(i) = t(i-1) + h
     end do 
     print '(A)', 'the vector t'
-    print '(F14.5)', t
+    print '(F14.2)', t
 
     ! the precise x calculation 
     x_precise = 4.0_dp * lambda_0 / (5.0_dp * (4.0_dp - lambda_0)) * t**2 + t**3
@@ -94,7 +94,7 @@ program IntergralEq
         end do
         n_actual = n_actual + 1
 
-        y = (x0 - x1)
+        y = abs(x0 - x1)
         if (sqrt(h * dot_product(y,y)) < Eps) exit
         x0 = x1
     end do
@@ -108,6 +108,12 @@ program IntergralEq
     print '(A)', 'posterior error in L_2[0,1]'
     y = x1 - x_precise
     print '(F14.5)', sqrt(h * dot_product(y,y))
+
+    print '(A)', 'final vector t           x1         x_precise'
+    do i = 1, size(t,1)
+        print '(3(F14.5, 1X))', t(i), x1(i), x_precise(i)
+    end do
+
     deallocate(t)
     deallocate(x0)
     deallocate(x1)
