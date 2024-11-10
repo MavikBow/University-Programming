@@ -4,7 +4,5 @@ set output "graph.png"
 set xlabel "t"
 set ylabel "values"
 set grid
-set xrange [0.8:1]
-set yrange [0.6:1.3]
 plot "plot_data.txt" using 1:2 with lines title "x_{approximate}", \
 	 "plot_data.txt" using 1:3 with lines title "x_{precise}"
