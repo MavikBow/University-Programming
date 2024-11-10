@@ -53,7 +53,7 @@ program IntergralEq
     n_actual = 0
     x0 = 0.0_dp
     do 
-        temp = dot_product(t, x0)
+        temp = dot_product(t, x0) - ((t(1)*x0(1) + t(m + 1)*x0(m +1)) / 2.0_dp)
         do i = 1, size(t, 1)
             x1(i) = lambda_0 * h * t(i)**2 * temp + t(i)**3
         end do
@@ -88,14 +88,15 @@ program IntergralEq
     n_actual = 0
     x0 = 0.0_dp
     do 
-        temp = dot_product(t, x0)
+        temp = dot_product(t, x0) - ((t(1)*x0(1) + t(m + 1)*x0(m +1)) / 2.0_dp)
         do i = 1, size(t, 1)
             x1(i) = lambda_0 * h * t(i)**2 * temp + t(i)**3
         end do
         n_actual = n_actual + 1
 
         y = abs(x0 - x1)
-        if (sqrt(h * dot_product(y,y)) < Eps) exit
+        temp = dot_product(y,y) - ((y(1)**2 - y(m + 1)**2) / 2.0_dp)
+        if (sqrt(h * temp) < Eps) exit
         x0 = x1
     end do
 
