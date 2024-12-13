@@ -12,9 +12,9 @@ program Jacobi_rotations
 
     integer, parameter :: dp = selected_real_kind(15, 307)
     real(kind=dp), dimension(:,:), allocatable :: matrixA, matrixU, matrixA_safe
-    real(kind=dp), dimension(:), allocatable :: sigma_vec, a_i_vec, a_j_vec
+    real(kind=dp), dimension(:), allocatable :: sigma_vec, a_i_vec, a_j_vec, P_n_vec
     real(kind=dp) :: cosin, sinus, temp, tau
-    real(kind=dp), parameter :: Eps = 1.0E-15_dp
+    real(kind=dp), parameter :: Eps = 1.0E-05_dp
     integer :: inputFile, matrixSize, iteration_counter
     integer :: i, j
 
@@ -28,6 +28,7 @@ program Jacobi_rotations
     allocate(sigma_vec(matrixSize))
     allocate(a_i_vec(matrixSize))
     allocate(a_j_vec(matrixSize))
+    allocate(P_n_vec(matrixSize))
    
     read(inputFile, *) (matrixA(i,:), i = 1, matrixSize)
 
@@ -131,6 +132,24 @@ program Jacobi_rotations
          print '(ES11.4)', maxval(abs(matmul(matrixA_safe,matrixU(:,i)) - matrixA(i,i) * matrixU(:,i)))
     end do
 
+    ! calculating the phi_i = P_n(lambda_i)
+    P_n_vec = (/ &
+        1.4348860999999875E+00, &
+        -7.6498836196250908E-01, &
+        1.8700501573960815E-01, &
+        -2.0631299536018971E-02, &
+        8.0343118688494617E-04 /)
+    
+    write(*,*)
+    print '(A)', 'discrepancy of P_n(lambda_i)'       
+    do i = 1, matrixSize
+        temp = matrixA(i,i)**5
+        do j = 1, matrixSize
+            temp = temp - P_n_vec(j) * matrixA(i,i)**(matrixSize-j)
+        end do
+        print '(ES11.4)', temp
+    end do
+
     close(inputFile) 
 
     deallocate(matrixA_safe)
@@ -139,5 +158,6 @@ program Jacobi_rotations
     deallocate(sigma_vec)
     deallocate(a_i_vec)
     deallocate(a_j_vec)
+    deallocate(P_n_vec)
 
 end program Jacobi_rotations
