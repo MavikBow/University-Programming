@@ -1,17 +1,29 @@
 package com.example.super_duper_formula_doer;
 
 import android.os.Bundle;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
+import androidx.core.view.GestureDetectorCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
+
+    private CheckBox checkBox;
+    private ImageView imageView;
+    private GestureDetectorCompat gestureDetectorCompat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +35,24 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        checkBox = (CheckBox)findViewById(R.id.checkBox);
+        imageView = (ImageView)findViewById(R.id.profile_image);
+
+        this.gestureDetectorCompat = new GestureDetectorCompat(this, new GestureListener());
+    }
+
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onDoubleTap(@NonNull MotionEvent e) {
+            if(MainActivity.this.checkBox.isChecked()) {
+                Animation rotate = AnimationUtils.loadAnimation(
+                        getApplicationContext(), R.anim.rotate
+                );
+                MainActivity.this.imageView.startAnimation(rotate);
+            }
+            return super.onDoubleTap(e);
+        }
     }
 
     public void DoTheSuperFormula(View v){
@@ -60,5 +90,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         tv1.setText(res_text);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+        gestureDetectorCompat.onTouchEvent(event);
+        return super.onTouchEvent(event);
     }
 }
