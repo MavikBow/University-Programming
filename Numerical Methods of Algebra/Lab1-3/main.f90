@@ -40,6 +40,7 @@ program lab1_3
     
 
     ! newton's method
+    print *, "Newton's method"
     x0 = x_start
     n_actual = 0
     do
@@ -55,6 +56,7 @@ program lab1_3
     print '(A)', "=========================================="
 
     ! secant method
+    print *, 'Secant method'
     x0 = x_start
     x1 = x0 - f(x0)/dfdx(x0)
     f0 = f(x0)
