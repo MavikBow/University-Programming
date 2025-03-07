@@ -5,14 +5,6 @@
 ! newton's method,
 ! secant method.
 
-! basically the matrix we work with is matrixFull
-! it looks like this: [A:f:E]
-! while we are transforming the A part into E as per Gauss-Jordan method
-! the f part turns into the x we search, and the E part becomes A^(-1)
-!
-! we need the -copy matrices to calculate and analyse the discrepancy afterwards
-! r is the discrepancy we get after counting x, and R - after A^(-1)
-
 program lab1_3
     implicit none
 
