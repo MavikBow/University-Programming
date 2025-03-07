@@ -43,6 +43,7 @@ program lab1_3
     enddo
     print *, 'The number of iterations: ', n_actual
     print '(A, ES11.4)', ' The discrepancy:  ', f(x1)
+    print '(A, F14.11)', ' Approximated root ', x1
     print '(A)', "=========================================="
     
 
@@ -58,6 +59,7 @@ program lab1_3
     enddo
     print *, 'The number of iterations: ', n_actual
     print '(A, ES11.4)', ' The discrepancy:  ', f(x1)
+    print '(A, F14.11)', ' Approximated root ', x1
     print '(A)', "=========================================="
 
     ! secant method
@@ -80,9 +82,7 @@ program lab1_3
     enddo
     print *, 'The number of iterations: ', n_actual
     print '(A, ES11.4)', ' The discrepancy:  ', f(x2)
-
-    !print '(A, F14.5)', ' detA is ', detA
-    !print '(ES11.4)', r
+    print '(A, F14.11)', ' Approximated root ', x2
 
 contains
     real(kind=dp) function phi(x)
