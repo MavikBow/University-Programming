@@ -10,7 +10,7 @@ program lab1_3
 
     integer, parameter :: dp = selected_real_kind(15, 307)
     real(kind=dp) :: x0, x1, x2, f0, f1
-    real(kind=dp), parameter :: EPS = 10e-7, PI = DACOS(-1.D0), x_start = PI / (-8.0_dp)
+    real(kind=dp), parameter :: EPS = 1e-7, PI = DACOS(-1.D0), x_start = PI / (-8.0_dp)
     integer :: n_approx, n_actual
     real(kind=dp) :: q, m, delta
 
@@ -33,7 +33,6 @@ program lab1_3
 !        print '(A, ES11.4)', ' closing in at ', abs(x1 - x0)
         x0 = x1
     enddo
-    x1 = phi(x1)
     print *, 'The number of iterations: ', n_actual
     print '(A, ES11.4)', ' The discrepancy:  ', f(x1)
     print '(A, F14.11)', ' Approximated root ', x1
