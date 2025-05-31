@@ -33,6 +33,7 @@ program lab1_3
 !        print '(A, ES11.4)', ' closing in at ', abs(x1 - x0)
         x0 = x1
     enddo
+    x1 = phi(x1)
     print *, 'The number of iterations: ', n_actual
     print '(A, ES11.4)', ' The discrepancy:  ', f(x1)
     print '(A, F14.11)', ' Approximated root ', x1
