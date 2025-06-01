@@ -2,13 +2,14 @@ program lab2
     implicit none
 
     integer, parameter :: dp = selected_real_kind(15, 307)
-    double precision, allocatable :: x(:), A(:,:)
-    double precision, parameter :: alpha_j = 0.3_dp
-    double precision :: x_s, x_ss, x_sss, temp
+    double precision, allocatable :: x(:), A(:,:), x_cheb(:)
+    double precision, parameter :: alpha_j = 0.3_dp, PI = DACOS(-1.D0)
+    double precision :: x_s, x_ss, x_sss, temp, temp1
     integer, parameter :: n = 10
     integer :: i, j
 
     allocate(x(n + 1))
+    allocate(x_cheb(n + 1))
     allocate(A(6, 7))
     
     do i = 0, n
@@ -19,6 +20,7 @@ program lab2
     x_ss = x(6) + dble(1) / dble(20)
     x_sss = x(10) - dble(1) / dble(30)
 
+    ! MHK ==========================================================
     do i = 1, 6
     do j = 1, 6
         A(i,j) = phil_phik(x, i-1, j-1)
@@ -27,11 +29,6 @@ program lab2
     enddo
 
     call gauss(A)
-
-!   print *, 'matrix A'
-!   do i = 1, 6
-!       print '(7(F10.5, 1X))', (A(i,j), j = 1, 7)
-!   end do
 
     print '(A)', "x(i)    f(x)    phi(x)"
     do i = 0, n
@@ -50,19 +47,58 @@ program lab2
     print '(ES11.4)', phi_real(A(:,7), x_s) - f_real(x_s)
     print '(ES11.4)', phi_real(A(:,7), x_ss) - f_real(x_ss)
     print '(ES11.4)', phi_real(A(:,7), x_sss) - f_real(x_sss)
+    print *, ' '
+
+    ! lagrange interpolation ==========================================
+    temp = 0
+    do i = 1, n
+        temp = max(temp, abs(lagrangeInterpolar2(x, x(i)) - f_real(x(i))))
+    enddo
+    ! this line prints NaN unless you comment out line 82 (idk)
+    print '(A, ES11.4)', 'overall discrep (method 2):   ', temp
+
+    print '(A)', '3 interpolar discrep (method 1):  '
+    print '(ES11.4)', lagrangeInterpolar(x, x_s) - f_real(x_s)
+    print '(ES11.4)', lagrangeInterpolar(x, x_ss) - f_real(x_ss)
+    print '(ES11.4)', lagrangeInterpolar(x, x_sss) - f_real(x_sss)
+
+    print '(A)', '3 interpolar discrep (method 2):  '
+    print '(ES11.4)', lagrangeInterpolar2(x, x_s) - f_real(x_s)
+    print '(ES11.4)', lagrangeInterpolar2(x, x_ss) - f_real(x_ss)
+    print '(ES11.4)', lagrangeInterpolar2(x, x_sss) - f_real(x_sss)
+    print *, ' '
+
+    ! lagrange cheb interpolation =====================================
+
+    do i = 0, n
+        x_cheb(i + 1) = alpha_j + dble(0.5) + cos(((2*i+1)*PI)/(2*(n+1))) / dble(2)
+    enddo
+
+    temp1 = 0
+    do i = 1, n
+        temp1 = max(temp1, abs(lagrangeInterpolar2(x_cheb, x(i)) - f_real(x(i))))
+    enddo
+    print '(A, ES11.4)', 'overall discrep (cheb):   ', temp1
+    
+    print '(A)', '3 interpolar discrep (cheb):  '
+    print '(ES11.4)', lagrangeInterpolar2(x_cheb, x_s) - f_real(x_s)
+    print '(ES11.4)', lagrangeInterpolar2(x_cheb, x_ss) - f_real(x_ss)
+    print '(ES11.4)', lagrangeInterpolar2(x_cheb, x_sss) - f_real(x_sss)
+
+    ! cubic spline ===================================================
 
     deallocate(x)
+    deallocate(x_cheb)
     deallocate(A)
-
 contains
-
-! for MHK
 
     double precision function f_real(x_i)
         implicit none
         double precision, intent(in) :: x_i
         f_real = alpha_j * EXP(-x_i) + (1_dp - alpha_j) * sin(x_i)
     end function f_real
+
+! for MHK
 
     double precision function phil_phik(x, l, k)
         implicit none
@@ -118,4 +154,77 @@ contains
         enddo
    end function phi_real
 
+   ! interpolar LaGrange
+
+   double precision function lagrangeInterpolar(x, x_)
+      double precision, dimension(:), intent(in) :: x
+      double precision, intent(in) :: x_
+      double precision :: res, temp
+      integer :: i, j
+
+      res = dble(0)
+      do i = 1, size(x)
+        temp = f_real(x(i))
+        do j = 1, size(x)
+            if (j .ne. i) then
+                temp = temp * (x_ - x(j)) / (x(i) - x(j))
+            endif
+        enddo
+        res = res + temp
+      enddo
+
+    lagrangeInterpolar = res
+
+   end function lagrangeInterpolar
+
+   double precision function omega(x, x_)
+      double precision, dimension(:), intent(in) :: x
+      double precision, intent(in) :: x_
+      integer :: i
+
+      omega = dble(1)
+      do i = 1, size(x)
+        omega = omega * (x_ - x(i))
+      enddo
+
+   end function omega
+
+   double precision function omega_derivative_at(x, i)
+      double precision, dimension(:), intent(in) :: x
+      integer, intent(in) :: i
+      double precision :: xi, res
+      integer :: j
+      
+      xi = x(i)
+      res = dble(1)
+      do j = 1, size(x)
+        if (j .ne. i) then
+            res = res * (xi - x(j))
+        endif
+      enddo
+
+      omega_derivative_at = res
+   end function omega_derivative_at
+
+   double precision function lagrangeInterpolar2(x, x_)
+      double precision, dimension(:), intent(in) :: x
+      double precision, intent(in) :: x_
+      double precision :: res, omega_x, temp
+      integer :: i
+      res = dble(0)
+      omega_x = omega(x, x_)
+      do i = 1, size(x)
+        temp = f_real(x(i)) * omega_x / ((x_ - x(i)) * omega_derivative_at(x, i))
+        res = res + temp
+      enddo
+
+      lagrangeInterpolar2 = res
+   end function lagrangeInterpolar2
+
 end program lab2
+
+!   print *, 'matrix A'
+!   do i = 1, 6
+!       print '(7(F10.5, 1X))', (A(i,j), j = 1, 7)
+!   end do
+
