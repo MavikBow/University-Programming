@@ -2,7 +2,7 @@
 FC = gfortran
 
 # Compiler flags
-FLAGS = -fimplicit-none -Wall -Werror -pedantic -O3 -fopenmp -fcheck=bounds #-Wextra 
+FLAGS = -fimplicit-none -Wall -Werror -pedantic -O1 -fopenmp -fcheck=bounds #-Wextra 
 
 # Source file
 SRC = main.f90

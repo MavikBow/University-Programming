@@ -18,7 +18,7 @@ program lab2
 
     x_s = x(1) + dble(2) / dble(30)
     x_ss = x(6) + dble(1) / dble(20)
-    x_sss = x(10) - dble(1) / dble(30)
+    x_sss = x(11) - dble(1) / dble(30)
 
     ! MHK ==========================================================
     do i = 1, 6
@@ -48,6 +48,7 @@ program lab2
     print '(ES11.4)', phi_real(A(:,7), x_ss) - f_real(x_ss)
     print '(ES11.4)', phi_real(A(:,7), x_sss) - f_real(x_sss)
     print *, ' '
+    deallocate(A)
 
     ! lagrange interpolation ==========================================
     temp = 0
@@ -84,8 +85,33 @@ program lab2
     print '(ES11.4)', lagrangeInterpolar2(x_cheb, x_s) - f_real(x_s)
     print '(ES11.4)', lagrangeInterpolar2(x_cheb, x_ss) - f_real(x_ss)
     print '(ES11.4)', lagrangeInterpolar2(x_cheb, x_sss) - f_real(x_sss)
+    print *, ' '
 
     ! cubic spline ===================================================
+    allocate(A(11, 12))
+    
+    A = dble(0)
+    do i = 2, n
+        A(i, i - 1) = h(x,i) / 6.D0
+        A(i, i) = (h(x,i) + h(x,i+1)) / 3.D0
+        A(i, i + 1) = h(x,i+1) / 6.D0
+        A(i, 12) = (f_real(x(i+1)) - f_real(x(i))) / h(x,i+1) - (f_real(x(i)) - f_real(x(i-1))) / h(x,i)
+    enddo
+    A(1,1) = 1.D0
+    A(11,11) = 1.D0
+
+    call triagonal(A(:,:11), A(:,12))
+
+    temp1 = 0
+    do i = 1, n
+        temp1 = max(temp1, abs(spline(A(:,12), x, x(i)) - f_real(x(i))))
+    enddo
+    print '(A, ES11.4)', 'overall discrep (spline):   ', temp1
+    
+    print '(A)', '3 interpolar discrep (spline):  '
+    print '(ES11.4)', spline2(A(:,12), x, x_s) - f_real(x_s)
+    print '(ES11.4)', spline2(A(:,12), x, x_ss) - f_real(x_ss)
+    print '(ES11.4)', spline2(A(:,12), x, x_sss) - f_real(x_sss)
 
     deallocate(x)
     deallocate(x_cheb)
@@ -220,6 +246,97 @@ contains
 
       lagrangeInterpolar2 = res
    end function lagrangeInterpolar2
+
+   ! cubic spline
+
+   double precision function h(x, i)
+       double precision, dimension(:), intent(in) :: x
+       integer, intent(in) :: i
+       h = x(i) - x(i-1)
+   end function h
+
+    subroutine triagonal(M, f)
+    real(kind=dp), dimension(:,:), intent(in) :: M
+    real(kind=dp), dimension(:), intent(inout) :: f
+    integer :: n, i
+    real(kind=dp), dimension(size(f)) :: ksi, eta, a, b, c
+    real(kind=dp) :: detI
+
+    n = size(f)
+
+    ! Extract tridiagonal coefficients
+    do i = 2, n
+        a(i - 1) = -M(i, i - 1)
+    end do
+
+    do i = 1, n - 1
+        b(i) = -M(i, i + 1)
+    end do
+
+    do i = 1, n
+        c(i) = M(i, i)
+    end do
+
+    ! Forward Elimination
+    ksi(n) = a(n - 1) / c(n)
+    eta(n) = f(n) / c(n)
+
+    do i = n - 1, 2, -1
+        detI = c(i) - ksi(i + 1) * b(i)
+        ksi(i) = a(i - 1) / detI
+        eta(i) = (f(i) + b(i) * eta(i + 1)) / detI
+    end do
+
+    detI = c(1) - ksi(2) * b(1)
+    eta(1) = (f(1) + b(1) * eta(2)) / detI
+
+    ! Back Substitution (storing results in f)
+    f(1) = eta(1)
+    do i = 1, n - 1
+        f(i + 1) = ksi(i + 1) * f(i) + eta(i + 1)
+    end do
+    end subroutine
+
+   double precision function spline(M, x, x_)
+       double precision, dimension(:), intent(in) :: M, x
+       double precision, intent(in) :: x_
+       integer :: i = 2
+
+       do while (i <= size(x) .and. x_ > x(i)) 
+            i = i + 1
+       end do
+
+       spline = M(i-1) * (x(i) - x_) ** 3 / (6.D0 * h(x,i)) + &
+       M(i) * (x_ - x(i-1)) ** 3 / (6.D0 * h(x,i)) + &
+       (f_real(x(i-1)) - M(i) * h(x,i) ** 2 / 6.D0) * (x(i) - x_) / h(x,i) + &
+       (f_real(x(i)) - M(i) * h(x,i) ** 2 / 6.D0) * (x_ - x(i-1)) / h(x,i)
+
+   end function spline
+
+   double precision function spline2(M, x, x_)
+       double precision, dimension(:), intent(in) :: M, x
+       double precision, intent(in) :: x_
+       double precision :: xi_1, xi, hi, A, B
+       integer :: i = 2
+
+       do while (i <= size(x) .and. x_ > x(i)) 
+            i = i + 1
+       end do
+       i = max(1, i)
+
+       xi_1 = x(i-1)
+       xi = x(i)
+       hi = xi - xi_1
+
+       A = (xi - x_) / hi
+       B = (x_ - xi_1) / hi
+
+       spline2 = M(i-1) * A ** 3 * hi / 6.D0 + &
+           M(i) * B ** 3 * hi / 6.D0 + &
+           (f_real(x(i-1)) - M(i-1) * hi * hi / 6.D0) * A + &
+           (f_real(x(i)) - M(i) * hi * hi / 6.D0) * B
+
+   end function spline2
 
 end program lab2
 
