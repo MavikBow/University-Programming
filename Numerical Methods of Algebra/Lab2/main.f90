@@ -34,6 +34,12 @@ program lab2
     do i = 0, n
         print '(F4.2, F14.11, F14.11)', x(i+1), f_real(x(i+1)), phi_real(A(:,7), x(i+1))
     enddo
+    print *, ' '
+    print '(A)', "c_i"
+    do i = 1, 6
+        print '(F14.11)', A(i,7)
+    enddo
+    print *, ' '
 
     ! discrepancy
     temp = 0
