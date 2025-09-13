@@ -1,0 +1,10 @@
+# RESET THE AMPL ENVIRONMENT
+reset;
+# LOAD THE MODEL
+model lab1.mod;
+# CHANGE THE SOLVER (optional)
+option solver cplex;
+# SOLVE
+solve;
+# SHOW RESULTS
+display x, y, c;
