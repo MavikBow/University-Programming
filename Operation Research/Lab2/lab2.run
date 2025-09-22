@@ -28,3 +28,5 @@ for {i in Client} {
   printf "\n";
 }
 
+display x_i6;
+
