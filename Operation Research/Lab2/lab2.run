@@ -1,0 +1,30 @@
+reset;
+
+model lab2.mod;
+data lab2.dat;
+
+option solver cplex;
+option solver_msg 0;
+
+# solutions 
+
+solve;
+display c;
+display is_open;
+display is_extended;
+display C_i;
+
+printf "X matrix:\n      ";
+for {j in WHouse} {
+  printf "%6d", j;
+}
+printf "\n";
+
+for {i in Client} {
+  printf "%6d", i;
+  for {j in WHouse} {
+    printf "%6d", x_ij[i,j];
+  }
+  printf "\n";
+}
+

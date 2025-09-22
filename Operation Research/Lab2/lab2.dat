@@ -1,0 +1,22 @@
+data;
+param I := 3; # clients
+param J := 5; # warehouses
+
+# transport cost from K_i client to S_j warehouse
+param a_ij : 	1	2	3	4	5 :=
+			1	3	2	9	5	7
+			2	7	6	3	6	3
+			3	4	8	4	4	9 ;
+
+# order amount per client
+param C_i := 1 20, 2 60, 3 40;
+
+# cost to open/upkeep a warehouse
+param W_j := 1 25, 2 50, 3 45, 4 15, 5 25;
+# cost per extra unit in warehouse 1
+param W1_extra := 1;
+
+# storage in every warehouse
+param S_j := 1 30, 2 10, 3 50, 4 20, 5 30;
+param S1_extra := 20;
+end;
