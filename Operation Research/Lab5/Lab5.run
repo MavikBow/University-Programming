@@ -1,0 +1,57 @@
+model Lab5.mod;
+data Lab5.dat;
+option solver cplex;
+option show_stats 1;
+
+solve;
+
+printf "Total cost %.2f\n", Total_Cost;
+printf "Finish date %.2f days\n", finish;
+printf "Deadline %.2f days\n", deadline;
+
+printf "Speed costs %.2f\n", sum{j in JOBS} cost_per_day[j] * (t_max[j] - t[j]);
+printf "Daily costs %.2f\n", project_cost_per_day * finish;
+
+printf "%-6s %-8s %-8s %-8s %-8s %-8s %-8s\n", 
+       "Work", "Start", "Finish", "t_spend", "t_max", "t_min", "Sped up";
+for {j in JOBS} {
+    printf "%-6s %-8.2f %-8.2f %-8.2f %-8.2f %-8.2f %-8.2f\n", 
+           j, start[j], start[j] + t[j], t[j], t_max[j], t_min[j], 
+           (t_max[j] - t[j]);
+}
+
+printf "Critical jobs (zero time reserve: ";
+for {j in JOBS} {
+    # Critical if slows down the production
+    # Or if it affects the finish time
+    if abs((start[j] + t[j]) - finish) < 0.001 then {
+        printf "%s ", j;
+    }
+}
+printf "\n";
+
+printf "%-6s %-12s %-12s %-12s\n", "Job", "Sped up", "Daily cost", "Cost total";
+for {j in JOBS} {
+    printf "%-6s %-12.2f %-12.2f %-12.2f\n", 
+           j, (t_max[j] - t[j]), cost_per_day[j], 
+           cost_per_day[j] * (t_max[j] - t[j]);
+}
+
+printf "Maximally sped up jobs: ";
+for {j in JOBS: t[j] <= t_min[j] + 0.001} {
+    printf "%s ", j;
+}
+printf "\n";
+
+printf "Not sped up jobs: ";
+for {j in JOBS: t[j] >= t_max[j] - 0.001} {
+    printf "%s ", j;
+}
+printf "\n";
+
+printf "Partially sped up jobs: ";
+for {j in JOBS: t[j] > t_min[j] + 0.001 and t[j] < t_max[j] - 0.001} {
+    printf "%s(%.1f) ", j, t[j];
+}
+printf "\n";
+
